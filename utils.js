@@ -31,8 +31,16 @@ const arrayFromOut = out =>
             .slice(0, -1)
         : out;
 
+const getPage = (
+    array,
+    pageSize = array.length,
+    pageNumber = 1
+) =>
+    array.splice((pageNumber - 1) * pageSize, pageSize);
+
 module.exports = {
     execCommand,
     execCommandWithRes,
     arrayFromOut,
+    getPage,
 };

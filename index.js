@@ -2,6 +2,7 @@ const app = require('./expressApp');
 const {
     execCommandWithRes,
     arrayFromOut,
+    getPage,
 } = require('./utils');
 const {
     PATH_TO_REPOS,
@@ -29,13 +30,13 @@ app.get('/api/repos',
 
 // Возвращает массив коммитов в данной ветке (или хэше коммита) вместе с датами их создания.
 app.get('/api/repos/:repositoryId/commits/:commitHash',
-    ({params: {repositoryId, commitHash}}, res) =>
+    ({params: {repositoryId, commitHash}, query: {pageSize, pageNumber}}, res) =>
         execCommandWithRes(
             `cd ${PATH_TO_REPOS}/${repositoryId} &&
             git checkout -q ${commitHash} &&
             git log --format="${GIT_LOG_FORMAT}"`,
             res,
-            arrayFromOut
+            out => getPage(arrayFromOut(out), pageSize, pageNumber)
         )
 );
 
