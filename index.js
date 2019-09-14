@@ -1,72 +1,15 @@
-const express = require('express');
-const {exec} = require('child_process');
-const bodyParser = require('body-parser');
-
-const app = express();
-app.use(express.static('static'));
-// to support JSON-encoded bodies
-app.use(bodyParser.json());
-// to support URL-encoded bodies
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
-
-const PATH_TO_REPOS = 'repos';
-const GIT_LOG_FORMAT = '%h %s - %ad';
-
-const MESSAGE = {
-    NO_ROUT: 'Rout not found.',
-    NO_REPOSITORY: 'Can\'t download repository with this url. Maybe we have already got repository with this name or url is not correct',
-    REPOSITORY_DELETED: 'repository successfully deleted',
-    REPOSITORY_CLONED: 'repository successfully cloned',
-};
-
-const createMessageObject = string => ({message: string});
-const createMessageObjectString = string => JSON.stringify(createMessageObject(string));
-
-const RESPONSE = {
-    NO_ROUT: res => () => res.status(404).json(createMessageObject(MESSAGE.NO_ROUT)),
-    NO_REPOSITORY: res => () => res.status(500).json(createMessageObject(MESSAGE.NO_REPOSITORY)),
-};
-
-const execCommand = (
-    command,
-    callbackOut = x => x,
-    callbackErr = callbackOut
-) =>
-    exec(command, (err, out) =>
-        err
-            ? callbackErr(err) && console.log(err)
-            : callbackOut(out)
-    );
-
-const execCommandWithRes = (
-    command,
-    res,
-    callbackOut = x => x,
-    callbackErr = RESPONSE.NO_ROUT(res)
-) =>
-    execCommand(
-        command,
-        json => res.json(callbackOut(json)),
-        callbackErr
-    );
-
-const arrayFromOut = out =>
-  typeof out === 'string'
-    ? out
-      .split('\n')
-      .slice(0, -1)
-    : out;
-
-app.post('/test',
-    (req, res) =>
-    res.json({req: JSON.stringify(req), res: JSON.stringify(res)})
-
-);
-
-// var bodyParser = require('body-parser');
-// app.use(bodyParser.urlencoded({ extended: false }));
+const app = require('./expressApp');
+const {
+    execCommandWithRes,
+    arrayFromOut,
+} = require('./utils');
+const {
+    PATH_TO_REPOS,
+    GIT_LOG_FORMAT,
+    MESSAGE,
+    RESPONSE,
+} = require('./config');
+const {createMessageObjectString} = require('./configUtils');
 
 app.get('some',
     (req, res) =>
