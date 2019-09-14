@@ -26,7 +26,7 @@ execCommandWithRes = (
         () =>
             res
               .status(404)
-              .send('Route Not found.')
+              .json({message: 'Route Not found.'})
     );
 
 arrayFromOut = out =>
@@ -91,7 +91,8 @@ app.get('/api/repos/:repositoryId',
         execCommandWithRes(
             `cd ${pathToRepos}/${repositoryId} &&
             ls`,
-            res
+            res,
+            arrayFromOut
         )
 );
 
@@ -127,8 +128,7 @@ app.get('/api/repos/:repositoryId/blob/:commitHash/*',
             `cd ${pathToRepos}/${repositoryId} &&
             git checkout -q ${commitHash} &&
             cat ${path}`,
-            res,
-            arrayFromOut
+            res
         )
 );
 
