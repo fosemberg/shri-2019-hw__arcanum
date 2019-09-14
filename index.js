@@ -1,45 +1,72 @@
 const express = require('express');
 const {exec} = require('child_process');
+const bodyParser = require('body-parser');
 
-const pathToRepos = 'repos';
+const app = express();
+app.use(express.static('static'));
+// to support JSON-encoded bodies
+app.use(bodyParser.json());
+// to support URL-encoded bodies
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+
+const PATH_TO_REPOS = 'repos';
+const GIT_LOG_FORMAT = '%h %s - %ad';
+
+const MESSAGE = {
+    NO_ROUT: 'Rout not found.',
+    NO_REPOSITORY: 'Can\'t download repository with this url. Maybe we have already got repository with this name or url is not correct',
+    REPOSITORY_DELETED: 'repository successfully deleted',
+    REPOSITORY_CLONED: 'repository successfully cloned',
+};
+
+const createMessageObject = string => ({message: string});
+const createMessageObjectString = string => JSON.stringify(createMessageObject(string));
+
+const RESPONSE = {
+    NO_ROUT: res => () => res.status(404).json(createMessageObject(MESSAGE.NO_ROUT)),
+    NO_REPOSITORY: res => () => res.status(500).json(createMessageObject(MESSAGE.NO_REPOSITORY)),
+};
 
 const execCommand = (
     command,
-    outCallback = x => x,
-    errCallback = outCallback
+    callbackOut = x => x,
+    callbackErr = callbackOut
 ) =>
     exec(command, (err, out) =>
         err
-            ? errCallback(err)
-            : outCallback(out)
+            ? callbackErr(err) && console.log(err)
+            : callbackOut(out)
     );
 
-execCommandWithRes = (
+const execCommandWithRes = (
     command,
     res,
-    callback = x => x
+    callbackOut = x => x,
+    callbackErr = RESPONSE.NO_ROUT(res)
 ) =>
     execCommand(
         command,
-        json =>
-            res.json(callback(json)),
-        () =>
-            res
-              .status(404)
-              .json({message: 'Route Not found.'})
+        json => res.json(callbackOut(json)),
+        callbackErr
     );
 
-arrayFromOut = out =>
+const arrayFromOut = out =>
   typeof out === 'string'
     ? out
       .split('\n')
       .slice(0, -1)
     : out;
 
+app.post('/test',
+    (req, res) =>
+    res.json({req: JSON.stringify(req), res: JSON.stringify(res)})
 
-const app = express();
+);
 
-app.use(express.static('static'));
+// var bodyParser = require('body-parser');
+// app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('some',
     (req, res) =>
@@ -50,7 +77,7 @@ app.get('some',
 app.get('/api/repos',
     (req, res) =>
         execCommandWithRes(
-            `cd ${pathToRepos} &&
+            `cd ${PATH_TO_REPOS} &&
             ls`,
             res,
             arrayFromOut
@@ -61,9 +88,9 @@ app.get('/api/repos',
 app.get('/api/repos/:repositoryId/commits/:commitHash',
     ({params: {repositoryId, commitHash}}, res) =>
         execCommandWithRes(
-            `cd ${pathToRepos}/${repositoryId} &&
+            `cd ${PATH_TO_REPOS}/${repositoryId} &&
             git checkout -q ${commitHash} &&
-            git log --format="%h %s - %ad"`,
+            git log --format="${GIT_LOG_FORMAT}"`,
             res,
             arrayFromOut
         )
@@ -73,7 +100,7 @@ app.get('/api/repos/:repositoryId/commits/:commitHash',
 app.get('/api/repos/:repositoryId/commits/:commitHash/diff',
     ({params: {repositoryId, commitHash}}, res) =>
         execCommandWithRes(
-            `cd ${pathToRepos}/${repositoryId} &&
+            `cd ${PATH_TO_REPOS}/${repositoryId} &&
             git diff ${commitHash}`,
             res
         )
@@ -89,7 +116,7 @@ app.get('/api/repos/:repositoryId/commits/:commitHash/diff',
 app.get('/api/repos/:repositoryId',
     ({params: {repositoryId}}, res) =>
         execCommandWithRes(
-            `cd ${pathToRepos}/${repositoryId} &&
+            `cd ${PATH_TO_REPOS}/${repositoryId} &&
             ls`,
             res,
             arrayFromOut
@@ -99,7 +126,7 @@ app.get('/api/repos/:repositoryId',
 app.get('/api/repos/:repositoryId/tree/:commitHash',
     ({params: {repositoryId, commitHash}}, res) =>
         execCommandWithRes(
-            `cd ${pathToRepos}/${repositoryId} &&
+            `cd ${PATH_TO_REPOS}/${repositoryId} &&
             git checkout ${commitHash} -q &&
             ls`,
             res,
@@ -109,7 +136,7 @@ app.get('/api/repos/:repositoryId/tree/:commitHash',
 
 app.get('/api/repos/:repositoryId/tree/:commitHash/*', ({params: {repositoryId, commitHash, 0: path}}, res) =>
     execCommandWithRes(
-        `cd ${pathToRepos}/${repositoryId} &&
+        `cd ${PATH_TO_REPOS}/${repositoryId} &&
         git checkout -q ${commitHash} &&
         ls ${path}`,
         res,
@@ -125,7 +152,7 @@ app.get('/api/repos/:repositoryId/tree/:commitHash/*', ({params: {repositoryId, 
 app.get('/api/repos/:repositoryId/blob/:commitHash/*',
     ({params: {repositoryId, commitHash, 0: path}}, res) =>
         execCommandWithRes(
-            `cd ${pathToRepos}/${repositoryId} &&
+            `cd ${PATH_TO_REPOS}/${repositoryId} &&
             git checkout -q ${commitHash} &&
             cat ${path}`,
             res
@@ -134,11 +161,43 @@ app.get('/api/repos/:repositoryId/blob/:commitHash/*',
 
 // DELETE /api/repos/:repositoryId
 // Безвозвратно удаляет репозиторий
-// app.delete()
+app.delete('/api/repos/:repositoryId',
+    ({params: {repositoryId}}, res) =>
+        execCommandWithRes(
+            `rm -rf ${PATH_TO_REPOS}/${repositoryId} &&
+            echo '${createMessageObjectString(MESSAGE.REPOSITORY_DELETED)}'`,
+            res,
+            x => JSON.parse(x),
 
+        )
+);
 
 // POST /api/repos/:repositoryId + { url: ‘repo-url’ }
 // Добавляет репозиторий в список, скачивает его по переданной в теле запроса ссылке и добавляет в папку со всеми репозиториями.
-// app.post()
+app.post('/api/repos/:repositoryId',
+        ({params: {repositoryId}, body: {url}}, res) => {
+            console.log(repositoryId, url);
+            execCommandWithRes(
+              `cd ${PATH_TO_REPOS} &&
+              git clone ${url} ${repositoryId} && 
+              echo '${createMessageObjectString(MESSAGE.REPOSITORY_CLONED)}'`,
+              res,
+                x => JSON.parse(x),
+                RESPONSE.NO_REPOSITORY(res)
+            )
+        }
+);
+
+app.post('/api/repos',
+        ({body: {url}}, res) =>
+            execCommandWithRes(
+                `cd ${PATH_TO_REPOS} &&
+                git clone ${url} && 
+                echo '${createMessageObjectString(MESSAGE.REPOSITORY_CLONED)}'`,
+                res,
+                x => JSON.parse(x),
+                RESPONSE.NO_REPOSITORY(res)
+        )
+);
 
 app.listen(3000);
