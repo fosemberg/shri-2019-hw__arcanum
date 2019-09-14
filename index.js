@@ -107,15 +107,13 @@ app.get('/api/repos/:repositoryId/count',
     ({params: {repositoryId}}, res) =>
         execCommandWithRes(
             `cd ${PATH_TO_REPOS}/${repositoryId} &&
-            find . -type f -exec grep 'string' '{}' -s -l -I \\; | xargs cat | perl -0777 -nE 's/\\n//g; $c{$_}++ for split //; say "\\"$_\\": \\"$c{$_}\\"," for sort keys %c' | tr -cd "[:print:]\\n" | egrep -v '""|"\\\\"|"$|^":'`,
+            find . -type f -exec grep 'string' '{}' -s -l -I \\; |
+            xargs cat |
+            perl -0777 -nE 's/\\n//g; $c{$_}++ for split //; say "\\"$_\\": \\"$c{$_}\\"," for sort keys %c' |
+            tr -cd "[:print:]\\n" |
+            egrep -v '""|"\\\\"|"$|^":'`,
             res,
-            x => {
-                console.log(x)
-                let newStr = "{ " + x.slice(0, -2) + "}";
-                // console.log(arrayFromOut(x));
-                console.log(JSON.parse(newStr));
-                return JSON.parse(newStr)
-            }
+            x => JSON.parse("{ " + x.slice(0, -2) + "}")
         )
 );
 
