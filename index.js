@@ -6,6 +6,7 @@ const {
 } = require('./utils');
 const {
     PATH_TO_REPOS,
+    PATH_TO_BACKUP,
     GIT_LOG_FORMAT,
     MESSAGE,
     RESPONSE,
@@ -29,6 +30,7 @@ app.get('/api/repos',
 );
 
 // Возвращает массив коммитов в данной ветке (или хэше коммита) вместе с датами их создания.
+// с пагинацией для списка коммитов
 app.get('/api/repos/:repositoryId/commits/:commitHash',
     ({params: {repositoryId, commitHash}, query: {pageSize, pageNumber}}, res) =>
         execCommandWithRes(
@@ -78,14 +80,15 @@ app.get('/api/repos/:repositoryId/tree/:commitHash',
         )
 );
 
-app.get('/api/repos/:repositoryId/tree/:commitHash/*', ({params: {repositoryId, commitHash, 0: path}}, res) =>
-    execCommandWithRes(
-        `cd ${PATH_TO_REPOS}/${repositoryId} &&
-        git checkout -q ${commitHash} &&
-        ls ${path}`,
-        res,
-        arrayFromOut
-    )
+app.get('/api/repos/:repositoryId/tree/:commitHash/*',
+    ({params: {repositoryId, commitHash, 0: path}}, res) =>
+        execCommandWithRes(
+            `cd ${PATH_TO_REPOS}/${repositoryId} &&
+            git checkout -q ${commitHash} &&
+            ls ${path}`,
+            res,
+            arrayFromOut
+        )
 );
 
 // GET /api/repos/:repositoryId/blob/:commitHash/:pathToFile
@@ -144,15 +147,21 @@ app.post('/api/repos',
         )
 );
 
+// Подсчета символов в репозитории, возвращает объект, в котором ключ - это символ, а значение - количество таких символов в репозитории. Во время запроса, сервер должен работать - то есть отвечать на другие запросы.
 app.get('/api/repos/:repositoryId/count',
     ({params: {repositoryId}}, res) =>
         execCommandWithRes(
-            `cd ${PATH_TO_REPOS}/${repositoryId} &&
+            `mkdir -p ${PATH_TO_BACKUP} &&
+            mkdir -p ${PATH_TO_BACKUP}/${repositoryId} &&
+            mv ${PATH_TO_REPOS}/${repositoryId}/.git/ ${PATH_TO_BACKUP}/${repositoryId}/ 2>/dev/null; true &&
+            cd ${PATH_TO_REPOS}/${repositoryId} &&
             find . -type f -exec grep 'string' '{}' -s -l -I \\; |
             xargs cat |
             perl -0777 -nE 's/\\n//g; $c{$_}++ for split //; say "\\"$_\\": \\"$c{$_}\\"," for sort keys %c' |
             tr -cd "[:print:]\\n" |
-            egrep -v '""|"\\\\"|"$|^":'`,
+            egrep -v '""|"\\\\"|"$|^":' &&
+            cd ../.. &&
+            mv ${PATH_TO_BACKUP}/${repositoryId}/.git ${PATH_TO_REPOS}/${repositoryId}/ 2>/dev/null; true`,
             res,
             x => JSON.parse("{ " + x.slice(0, -2) + "}")
         )

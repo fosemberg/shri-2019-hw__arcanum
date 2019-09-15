@@ -1,6 +1,7 @@
 const {createMessageObject} = require('./configUtils');
 
 const PATH_TO_REPOS = 'repos';
+const PATH_TO_BACKUP = 'backup';
 const GIT_LOG_FORMAT = '%h %s - %ad';
 
 const MESSAGE = {
@@ -17,6 +18,7 @@ const RESPONSE = {
 
 module.exports = {
     PATH_TO_REPOS,
+    PATH_TO_BACKUP,
     GIT_LOG_FORMAT,
     MESSAGE,
     RESPONSE,
