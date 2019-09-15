@@ -90,3 +90,7 @@ typings/
 .dynamodb/
 
 .idea
+
+repos
+
+backup
