@@ -9,11 +9,13 @@ const MESSAGE = {
     NO_REPOSITORY: 'Can\'t download repository with this url. Maybe we have already got repository with this name or url is not correct',
     REPOSITORY_DELETED: 'repository successfully deleted',
     REPOSITORY_CLONED: 'repository successfully cloned',
+    COUNTING_LETTERS_ERROR: 'Server can\'t count letters in this repository, maybe because this repository is too big for this little server',
 };
 
 const RESPONSE = {
     NO_ROUT: res => () => res.status(404).json(createMessageObject(MESSAGE.NO_ROUT)),
     NO_REPOSITORY: res => () => res.status(500).json(createMessageObject(MESSAGE.NO_REPOSITORY)),
+    COUNTING_LETTERS_ERROR: res => () => res.status(500).json(createMessageObject(MESSAGE.COUNTING_LETTERS_ERROR)),
 };
 
 module.exports = {

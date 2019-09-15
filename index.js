@@ -163,7 +163,9 @@ app.get('/api/repos/:repositoryId/count',
             cd ../.. &&
             mv ${PATH_TO_BACKUP}/${repositoryId}/.git ${PATH_TO_REPOS}/${repositoryId}/ 2>/dev/null; true`,
             res,
-            x => JSON.parse("{ " + x.slice(0, -2) + "}")
+            x => JSON.parse("{ " + x.slice(0, -2) + "}"),
+            RESPONSE.COUNTING_LETTERS_ERROR(res),
+            {timeout: 5000}
         )
 );
 

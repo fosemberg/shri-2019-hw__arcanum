@@ -4,9 +4,10 @@ const {RESPONSE} = require('./config');
 const execCommand = (
     command,
     callbackOut = x => x,
-    callbackErr = callbackOut
+    callbackErr = callbackOut,
+    options = {},
 ) =>
-    exec(command, (err, out) =>
+    exec(command, options, (err, out) =>
         err
             ? callbackErr(err) && console.log(err)
             : callbackOut(out)
@@ -16,12 +17,14 @@ const execCommandWithRes = (
     command,
     res,
     callbackOut = x => x,
-    callbackErr = RESPONSE.NO_ROUT(res)
+    callbackErr = RESPONSE.NO_ROUT(res),
+    options = {},
 ) =>
     execCommand(
         command,
         json => res.json(callbackOut(json)),
-        callbackErr
+        callbackErr,
+        options,
     );
 
 const arrayFromOut = out =>
