@@ -13,11 +13,6 @@ const {
 } = require('./config');
 const {createMessageObjectString} = require('./configUtils');
 
-app.get('some',
-    (req, res) =>
-        res.status(404)
-);
-
 // Возвращает массив репозиториев, которые имеются в папке.
 app.get('/api/repos',
     (req, res) =>
@@ -124,7 +119,7 @@ app.post('/api/repos/:repositoryId',
         console.log(repositoryId, url);
         execCommandWithRes(
             `cd ${PATH_TO_REPOS} &&
-              git clone ${url} ${repositoryId} && 
+              git clone ${url.replace(/https?(:\/\/)/,'git$1')} ${repositoryId} && 
               echo '${createMessageObjectString(MESSAGE.REPOSITORY_CLONED)}'`,
             res,
             x => JSON.parse(x),
@@ -139,7 +134,7 @@ app.post('/api/repos',
     ({body: {url}}, res) =>
         execCommandWithRes(
             `cd ${PATH_TO_REPOS} &&
-                git clone ${url} && 
+                git clone ${url.replace(/https?(:\/\/)/,'git$1')} && 
                 echo '${createMessageObjectString(MESSAGE.REPOSITORY_CLONED)}'`,
             res,
             x => JSON.parse(x),
