@@ -75,7 +75,7 @@ app.get('/api/repos/:repositoryId/tree/:commitHash',
             ls`,
             res,
             arrayFromOut
-          )
+        )
 );
 
 app.get('/api/repos/:repositoryId/tree/:commitHash/*', ({params: {repositoryId, commitHash, 0: path}}, res) =>
@@ -92,7 +92,6 @@ app.get('/api/repos/:repositoryId/tree/:commitHash/*', ({params: {repositoryId, 
 // Возвращает содержимое конкретного файла, находящегося по пути pathToFile в ветке (или по хэшу коммита) branchName. С используемой памятью должно быть все в порядке.
 //     Примеры:
 // /api/repos/cool-timer/blob/cool-branch/src/components/Header/index.tsx
-
 app.get('/api/repos/:repositoryId/blob/:commitHash/*',
     ({params: {repositoryId, commitHash, 0: path}}, res) =>
         execCommandWithRes(
@@ -100,6 +99,48 @@ app.get('/api/repos/:repositoryId/blob/:commitHash/*',
             git checkout -q ${commitHash} &&
             cat ${path}`,
             res
+        )
+);
+
+// DELETE /api/repos/:repositoryId
+// Безвозвратно удаляет репозиторий
+app.delete('/api/repos/:repositoryId',
+    ({params: {repositoryId}}, res) =>
+        execCommandWithRes(
+            `rm -rf ${PATH_TO_REPOS}/${repositoryId} &&
+            echo '${createMessageObjectString(MESSAGE.REPOSITORY_DELETED)}'`,
+            res,
+            x => JSON.parse(x),
+        )
+);
+
+// POST /api/repos/:repositoryId + { url: ‘repo-url’ }
+// Добавляет репозиторий в список, скачивает его по переданной в теле запроса ссылке и добавляет в папку со всеми репозиториями c названием :repositoryId.
+app.post('/api/repos/:repositoryId',
+    ({params: {repositoryId}, body: {url}}, res) => {
+        console.log(repositoryId, url);
+        execCommandWithRes(
+            `cd ${PATH_TO_REPOS} &&
+              git clone ${url} ${repositoryId} && 
+              echo '${createMessageObjectString(MESSAGE.REPOSITORY_CLONED)}'`,
+            res,
+            x => JSON.parse(x),
+            RESPONSE.NO_REPOSITORY(res)
+        )
+    }
+);
+
+// POST /api/repos + { url: ‘repo-url’ }
+// Добавляет репозиторий в список, скачивает его по переданной в теле запроса ссылке и добавляет в папку со всеми репозиториями.
+app.post('/api/repos',
+    ({body: {url}}, res) =>
+        execCommandWithRes(
+            `cd ${PATH_TO_REPOS} &&
+                git clone ${url} && 
+                echo '${createMessageObjectString(MESSAGE.REPOSITORY_CLONED)}'`,
+            res,
+            x => JSON.parse(x),
+            RESPONSE.NO_REPOSITORY(res)
         )
 );
 
@@ -114,47 +155,6 @@ app.get('/api/repos/:repositoryId/count',
             egrep -v '""|"\\\\"|"$|^":'`,
             res,
             x => JSON.parse("{ " + x.slice(0, -2) + "}")
-        )
-);
-
-// DELETE /api/repos/:repositoryId
-// Безвозвратно удаляет репозиторий
-app.delete('/api/repos/:repositoryId',
-    ({params: {repositoryId}}, res) =>
-        execCommandWithRes(
-            `rm -rf ${PATH_TO_REPOS}/${repositoryId} &&
-            echo '${createMessageObjectString(MESSAGE.REPOSITORY_DELETED)}'`,
-            res,
-            x => JSON.parse(x),
-
-        )
-);
-
-// POST /api/repos/:repositoryId + { url: ‘repo-url’ }
-// Добавляет репозиторий в список, скачивает его по переданной в теле запроса ссылке и добавляет в папку со всеми репозиториями.
-app.post('/api/repos/:repositoryId',
-        ({params: {repositoryId}, body: {url}}, res) => {
-            console.log(repositoryId, url);
-            execCommandWithRes(
-              `cd ${PATH_TO_REPOS} &&
-              git clone ${url} ${repositoryId} && 
-              echo '${createMessageObjectString(MESSAGE.REPOSITORY_CLONED)}'`,
-              res,
-                x => JSON.parse(x),
-                RESPONSE.NO_REPOSITORY(res)
-            )
-        }
-);
-
-app.post('/api/repos',
-        ({body: {url}}, res) =>
-            execCommandWithRes(
-                `cd ${PATH_TO_REPOS} &&
-                git clone ${url} && 
-                echo '${createMessageObjectString(MESSAGE.REPOSITORY_CLONED)}'`,
-                res,
-                x => JSON.parse(x),
-                RESPONSE.NO_REPOSITORY(res)
         )
 );
 
