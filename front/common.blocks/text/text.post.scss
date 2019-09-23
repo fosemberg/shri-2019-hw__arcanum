@@ -1,0 +1,36 @@
+:block(text) {
+    &:mod(size xs) {
+        font-size: var(--font-xs);
+        line-height: var(--line-s);
+    }
+
+
+    &:mod(color purple) {
+        color: var(--purple);
+    }
+
+    &:mod(color success) {
+        color: var(--success);
+    }
+
+    &:mod(color accented) {
+        color: var(--accented);
+    }
+
+    &:mod(color reserved) {
+        color: var(--diff-reserved);
+    }
+
+    &:mod(color diff-comment) {
+        color: var(--diff-comment);
+    }
+
+    &:mod(color diff-accented) {
+        color: var(--diff-accented);
+    }
+
+
+    &:mod(indent-r m) {
+        margin-right: var(--space-m);
+    }
+}

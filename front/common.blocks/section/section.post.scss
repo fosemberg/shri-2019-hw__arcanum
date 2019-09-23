@@ -1,0 +1,33 @@
+:block(section) {
+    &:mod(indent-b xxxxs) {
+        margin-bottom: var(--space-xxxs);
+    }
+
+    &:mod(indent-b m) {
+        margin-bottom: var(--space-m);
+    }
+
+    &:mod(indent-b xxl) {
+        margin-bottom: var(--space-xxl);
+    }
+
+    &:mod(indent-b xxxxl) {
+        margin-bottom: var(--space-xxxxl);
+    }
+
+    &:mod(indent-t m) {
+        margin-top: var(--space-m);
+    }
+
+    &:mod(indent-t xxxxs) {
+        margin-top: var(--space-xxxs);
+    }
+
+    &:mod(space-v xxl) {
+        padding: var(--space-xxl) 0;
+    }
+
+    &:mod(space-v xxxxl) {
+        padding: var(--space-xxxxl) 0;
+    }
+}

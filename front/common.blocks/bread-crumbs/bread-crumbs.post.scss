@@ -1,0 +1,40 @@
+:block(bread-crumbs) {
+    display: flex;
+    padding-top: var(--space-s);
+    padding-bottom: var(--space-s);
+    font-family: var(--font);
+    color: var(--secondary);
+    font-size: var(--font-s);
+
+    &:mod(border-b) {
+        border-bottom: 1px solid var(--border-faded);
+    }
+
+    &:elem(item) {
+        &:after {
+            content: '/';
+            margin: 0 var(--space-s);
+            position: relative;
+            top: 1px;
+        }
+
+        &:only-of-type {
+            color: var(--primary);
+        }
+
+        &:last-of-type {
+            font-weight: bold;
+            color: var(--primary);
+
+            &:after {
+                content: '';
+                margin: 0;
+            }
+        }
+    }
+
+    &:elem(slash) {
+        margin-right: var(--space-s);
+        margin-left: var(--space-s);
+    }
+}

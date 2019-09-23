@@ -1,0 +1,74 @@
+:block(branch-info) {
+    font-family: var(--font);
+    padding: var(--space-s) 0 var(--space-xs);
+
+    &:mod(border bottom) {
+        border-bottom: 1px solid var(--border-faded);
+    }
+
+    &:elem(header) {
+        display: flex;
+
+        @media screen and (max-width: 600px) {
+            flex-wrap: wrap;
+        }
+
+        &:mod(space between) {
+            justify-content: space-between;
+        }
+
+        &:mod(align baseline) {
+            align-items: baseline;
+        }
+    }
+
+    &:elem(name) {
+        font-size: var(--font-l);
+        line-height: var(--line-l);
+        color: var(--primary);
+        font-weight: bold;
+        margin-right: var(--space-xxs);
+        letter-spacing: -.3px;
+
+        &:mod(size xl) {
+            font-size: var(--font-xl);
+
+            @media screen and (max-width: 600px) {
+                font-size: var(--font-l);
+                order: 2;
+            }
+        }
+    }
+
+    &:elem(select) {
+        font-size: var(--font-l);
+        line-height: var(--line-l);
+    }
+
+    &:elem(info) {
+        font-size: var(--font-s);
+        line-height: var(--line-m);
+        color: var(--primary);
+        margin-top: var(--space-xxs);
+        margin-bottom: var(--space-m);
+
+        &:mod(no-space-b touch) {
+            @media screen and (max-width: 600px) {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    &:elem(action) {
+        display: flex;
+        font-size: var(--font-xs);
+        line-height: var(--line-xs);
+
+        @media screen and (max-width: 600px) {
+            order: 1;
+            width: 100%;
+            justify-content: space-between;
+            margin-bottom: var(--space-s);
+        }
+    }
+}

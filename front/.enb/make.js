@@ -58,7 +58,9 @@ module.exports = function(config) {
             // css
             [techs.postcss, {
                 target: '?.css',
-                oneOfSourceSuffixes: ['post.css', 'css'],
+                // TODO: изменить расшерение на `oneOfSourceSuffixes: ['post.css', 'css'],`
+                // когда зарезолвится issue: https://youtrack.jetbrains.com/issue/WEB-24368
+                sourceSuffixes: ['post.scss', 'post.css', 'css'],
                 plugins: techs.postcssPlugins
             }],
 

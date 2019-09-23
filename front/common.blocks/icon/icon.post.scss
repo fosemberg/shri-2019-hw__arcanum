@@ -1,0 +1,27 @@
+:block(icon) {
+    display: inline-block;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    &:mod(type arrow-up) {
+        background-image: url('arrow_up.svg');
+    }
+
+    &:mod(type code) {
+        background-image: url('code_file_grey.svg');
+    }
+
+    &:mod(size xs) {
+        width: 12px;
+        height: 12px;
+    }
+
+    &:mod(size s) {
+        width: 13px;
+        height: 20px;
+    }
+
+    &:mod(indent-r xxs) {
+        margin-right: var(--space-xxs);
+    }
+}

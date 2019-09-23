@@ -1,0 +1,228 @@
+:block(editor) {
+    border-radius: 4px;
+    position: relative;
+    margin-left: var(--space-xxl);
+    margin-right: var(--space-xxl);
+
+    &:mod(border faded) {
+        border: 1px solid var(--border-faded);
+    }
+
+    &:mod(border ghost) {
+        border: 1px solid var(--border-ghost);
+    }
+
+    @media screen and (max-width: 600px) {
+        border: none;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    &:elem(header) {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        font-family: var(--font);
+        font-size: var(--font-s);
+        line-height: var(--line-m);
+        border-radius: 4px;
+
+        &:mod(border-v ghost) {
+            border-top: 1px solid var(--border-ghost);
+            border-bottom: 1px solid var(--border-ghost);
+        }
+
+        &:mod(space-h s) {
+            padding-left: var(--space-s);
+            padding-right: var(--space-s);
+        }
+
+        &:mod(space-h m) {
+            padding-left: var(--space-m);
+            padding-right: var(--space-m);
+        }
+
+        &:mod(space-v s) {
+            padding-top: var(--space-xxs);
+            padding-bottom: 6px;
+        }
+
+        &:mod(space-v m) {
+            padding-top: 13px;
+            padding-bottom: 10px;
+        }
+
+        &:mod(color default) {
+            background: var(--editor-header);
+        }
+
+        &:mod(color pale) {
+            background: var(--pale);
+        }
+
+        @media screen and (max-width: 600px) {
+            border-radius: 0;
+            padding-top: var(--space-xxs);
+            padding-bottom: 6px;
+        }
+    }
+
+    &:elem(header-item) {
+        display: flex;
+        align-items: center;
+    }
+
+    &:elem(header-paragraph) {
+        margin: 0;
+        display: block;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    &:elem(byte-count) {
+        color: var(--faded);
+        font-size: var(--font-xs);
+        line-height: var(--line-m);
+        margin-left: var(--space-xxxs);
+    }
+
+    &:elem(action) {
+        width: 38px;
+        height: 28px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        background-image: url('download.svg');
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    &:elem(body) {
+        box-sizing: border-box;
+        width: 100%;
+        font-family: var(--editor-font);
+        font-size: var(--font-xxs);
+        line-height: var(--line-m);
+        margin-top: var(--space-xxxxs);
+
+        &:mod(border collapse) {
+            border-collapse: collapse;
+
+            & .editor-number {
+                @media screen and (max-width: 600px) {
+                    width: 27px;
+                }
+            }
+        }
+
+        &:mod(color main) {
+            color: var(--editor-main);
+        }
+
+        @media screen and (max-width: 600px) {
+            padding-left: var(--space-m);
+            padding-right: var(--space-m);
+        }
+    }
+
+    &:elem(row) {
+        vertical-align: top;
+
+        &:mod(color added) {
+            background: var(--added-backgound);
+        }
+
+        &:mod(color deleted) {
+            background: var(--deleted-background);
+        }
+    }
+
+    &:elem(number) {
+        width: 41px;
+        text-align: right;
+        color: var(--editor-number);
+        padding: 0;
+
+        &:mod(width s) {
+            width: 35px;
+
+            @media screen and (max-width: 600px) {
+                width: 10px;
+            }
+        }
+
+        &:mod(space-l touch) {
+            @media screen and (max-width: 600px) {
+                padding-left: 5px;
+            }
+        }
+
+        @media screen and (max-width: 600px) {
+            width: 10px;
+        }
+    }
+
+    &:elem(line) {
+        overflow: visible;
+        text-align: left;
+        padding: 0 0 0 var(--space-xxl);
+
+        @media screen and (max-width: 600px) {
+            padding: 0 0 0 var(--space-s);
+        }
+    }
+
+    &:elem(item) {
+        display: inline-block;
+        word-break: break-word;
+
+        &:mod(color link) {
+            color: var(--editor-link);
+        }
+
+        &:mod(color comment) {
+            color: var(--tertiary);
+        }
+
+        &:mod(weight bold) {
+            font-weight: bold;
+        }
+
+        &:mod(indent-l 1x) {
+            margin-left: var(--space-1x);
+        }
+
+        &:mod(indent-l 2x) {
+            margin-left: var(--space-2x);
+        }
+
+        &:mod(indent-l 3x) {
+            margin-left: var(--space-3x);
+        }
+    }
+
+    &:elem(info) {
+        display: flex;
+
+        @media screen and (max-width: 600px) {
+            width: 100%;
+            justify-content: space-between;
+            margin-top: var(--space-xs);
+        }
+    }
+
+    &:elem(infoitem) {
+        margin-right: var(--space-m);
+
+        &:last-of-type {
+            margin-right: 0;
+        }
+    }
+
+    &:elem(M) {
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-right: var(--space-s);
+    }
+}

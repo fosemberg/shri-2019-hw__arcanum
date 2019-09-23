@@ -1,0 +1,48 @@
+:block(layout) {
+    margin: 0;
+    background: var(--default);
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    &:elem(container) {
+        margin: 0 var(--space-xxl);
+
+        &:mod(grow true) {
+            flex: 1 0 auto;
+        }
+
+        @media screen and (max-width: 600px) {
+            margin: 0 var(--space-m);
+        }
+
+        &:mod(align center) {
+            margin: 0 auto;
+        }
+
+        &:mod(size s) {
+            max-width: 880px;
+        }
+
+        &:mod(size m) {
+            max-width: 1144px;
+        }
+
+        &:mod(space-v xxxxl) {
+            padding: var(--space-xxxxl) 0;
+        }
+
+        &:mod(space-v xxxxxl) {
+            padding: var(--space-xxxxxl) 0;
+        }
+
+        &:mod(indent-b xxl) {
+            margin-bottom: var(--space-xxl);
+        }
+
+        &:mod(indent-b xxxxl) {
+            margin-bottom: var(--space-xxxxl);
+        }
+    }
+}

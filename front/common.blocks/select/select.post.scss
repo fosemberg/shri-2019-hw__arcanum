@@ -1,0 +1,40 @@
+:block(select) {
+    font-size: var(--font-s);
+    position: relative;
+
+    &:elem(name) {
+        &:mod(weight bold) {
+            font-weight: bold;
+        }
+
+        &:mod(color secondary) {
+            color: var(--secondary);
+        }
+    }
+
+    &:elem(arrow) {
+        position: absolute;
+
+        &:mod(position center) {
+            right: -15px;
+            top: 6px;
+        }
+
+        &:mod(position baseline) {
+            right: -15px;
+            top: 10px;
+        }
+
+    }
+
+    &:mod(size small) {
+        font-size: var(--font-s);
+        line-height: var(--line-s);
+        letter-spacing: -.3px;
+    }
+
+    &:mod(size big) {
+        font-size: var(--font-l);
+        line-height: var(--line-l);
+    }
+}

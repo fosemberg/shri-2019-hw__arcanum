@@ -1,0 +1,24 @@
+:block(button) {
+    font-family: var(--font);
+    padding: 7px var(--space-s) 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+
+    &:mod(color default) {
+        background: var(--plain);
+        color: var(--primary);
+    }
+
+    &:mod(width full) {
+        width: 100%;
+    }
+
+    &:elem(icon) {
+        margin-right: 6px;
+    }
+
+    &:elem(text) {
+        width: max-content;
+    }
+}

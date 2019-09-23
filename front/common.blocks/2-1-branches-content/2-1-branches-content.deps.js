@@ -1,0 +1,6 @@
+({
+    shouldDeps: [
+        'page-deps',
+        'table'
+    ]
+})

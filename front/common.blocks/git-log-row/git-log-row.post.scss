@@ -1,0 +1,52 @@
+$mobile-breakpoint: 600px;
+
+:block(git-log-row) {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  color: var(--primary);
+  font-family: var(--font);
+  font-size: var(--font-s);
+  line-height: var(--line-m);
+
+  &:mod(border bottom) {
+      border-bottom: 1px solid var(--border-faded);
+  }
+
+  &:mod(padding both) {
+      padding: var(--space-s) 0;
+  }
+
+  &:mod(hide desktop) {
+      display: none;
+      @media screen and (max-width: $mobile-breakpoint) {
+        display: flex;
+      }
+  }
+
+  &:elem(item) {
+    &:mod(padding both) {
+        padding: var(--space-xxxs) 0;
+    }
+
+    &:mod(display flex) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+  }
+
+  &:elem(message) {
+    margin-right: var(--space-xs);
+  }
+
+  &:elem(arrow) {
+    position: absolute;
+    top: 45%;
+    right: 0;
+  }
+
+  &:elem(title) {
+    font-weight: bold;
+  }
+}

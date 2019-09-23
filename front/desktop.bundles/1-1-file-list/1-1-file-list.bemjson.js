@@ -1,0 +1,9 @@
+var page = '1-1-file-list'
+module.exports = {
+    block: 'page',
+    title: page,
+    head: [
+        {elem: 'css', url: `${page}.css`},
+    ],
+    content: {block: `${page}-content`}
+}

@@ -1,0 +1,33 @@
+:block(header) {
+    width: 100%;
+    display: flex;
+    border-bottom: 1px solid var(--border-ghost);
+    box-sizing: border-box;
+    padding: var(--space-m) var(--space-xxl) 18px;
+    font-family: var(--font);
+    align-items: flex-end;
+
+    @media screen and (max-width: 600px) {
+        padding: var(--space-m) var(--space-m) 18px;
+    }
+
+    &:elem(logo) {
+        width: 118px;
+        height: 20px;
+        background: url('logo.svg');
+        margin-right: var(--space-xxxl);
+    }
+
+    &:elem(select) {
+        &:after {
+            content: '';
+            width: 100%;
+            position: absolute;
+            bottom: -19px;
+            left: 0;
+            right: 0;
+            height: 0.5em;
+            border-bottom: 2px solid var(--border);
+        }
+    }
+}
