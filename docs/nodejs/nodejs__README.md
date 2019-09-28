@@ -1,5 +1,7 @@
 ### Сервер на Node.js, который предоставляет клиенту API для работы с git репозиториями.
 
+[ТЗ](nodejs__TASK.md)
+
 project dependency on some linux cli:
   - git
   - perl
