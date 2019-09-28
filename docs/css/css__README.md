@@ -2,7 +2,10 @@
 
 запустить проект:
 
-```npm run start```
+```npm
+npm i &&
+npm run start
+```
 
 Это форк от [BEM project stub](https://github.com/bem/project-stub).
 
