@@ -1,9 +1,9 @@
-## Домашнее задание по адаптивной верстке
+#### architecture
+- [README](docs/architecture/architecture__README.md)
+- [REVIEW](docs/architecture/architecture__REVIEW.md)
+- [TASK](docs/architecture/architecture__TASK.md)
 
-запустить проект:
-
-```npm run start```
-
-Это форк от [BEM project stub](https://github.com/bem/project-stub).
-
-В ветке только один коммит, потому что сначала велась разработка в другом репозитории, затем по просьбе курктора был перенес в репозиторий с перым заданием (ради дальнейшей интеграци...)
+#### CSS
+- [README](docs/css/CSS__README.md)
+- [REVIEW](docs/css/CSS__REVIEW.md)
+- [TASK](docs/css/CSS__TASK.md)
