@@ -22,4 +22,4 @@ npm run start
 ### Более подробное описание заданий
 - [Архитектура](docs/architecture/architecture__README.md)
 - [Адаптивная верстка](docs/css/css__README.md)
-- [Node JS](docs/nodejs2/nodejs__README.md)
+- [Node JS](docs/nodejs/nodejs__README.md)
