@@ -8,6 +8,7 @@
 
 #### Запуск back-end:
 ```npm
+cd back &&
 npm i &&
 npm run start 
 ```
