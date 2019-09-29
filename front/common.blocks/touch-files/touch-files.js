@@ -1,16 +1,4 @@
 class TouchFiles extends View {
-    constructor(el, store) {
-        super(el, store);
-        this._onInput = this._onInput.bind(this);
-        this._el.addEventListener('change', this._onInput);
-    }
-
-    _onInput(event) {
-        const action = setNameAction(event.target.value)
-        console.log(action);
-        this._store.dispatch(action);
-    }
-
     render({searchQuery, files}) {
         console.log(searchQuery);
         return files
@@ -40,11 +28,6 @@ class TouchFiles extends View {
             <i class="git-log-row__arrow arrow arrow_state_right arrow_color_faded arrow_size_l"></i>
         </div>
         `, '')
-    }
-
-    destroy() {
-        super.destroy();
-        this._el.removeEventListener('change', this._onInput);
     }
 }
 

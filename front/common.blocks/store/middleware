@@ -1,6 +1,0 @@
-export const middleware =
-    dispatch =>
-        action => {
-            const result = dispatch(action);
-            return result
-        }

@@ -1,16 +1,4 @@
 class DesktopFiles extends View {
-    constructor(el, store) {
-        super(el, store);
-        this._onInput = this._onInput.bind(this);
-        this._el.addEventListener('change', this._onInput);
-    }
-
-    _onInput(event) {
-        const action = setNameAction(event.target.value)
-        console.log(action);
-        this._store.dispatch(action);
-    }
-
     render({searchQuery, files}) {
         console.log(searchQuery);
         return files
@@ -39,11 +27,6 @@ class DesktopFiles extends View {
             <td class="table__cell">${updated}</td>
         </tr>
         `, '')
-    }
-
-    destroy() {
-        super.destroy();
-        this._el.removeEventListener('change', this._onInput);
     }
 }
 

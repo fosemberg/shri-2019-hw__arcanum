@@ -8,6 +8,7 @@ class SearchInput extends View {
     _onInput(event) {
         this._store.dispatch(setSearchQueryAction(event.target.value));
     }
+
     render({searchQuery}) {
         console.log('searchQuery', searchQuery);
         return `
