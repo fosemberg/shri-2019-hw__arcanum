@@ -46,7 +46,6 @@ var contentMock = [
         committer: 'mvel',
         updated: 'Dec 29, 2017'
     },
-
 ]
 var page = '1-1-file-list';
 block(`${page}-content`)(
@@ -156,7 +155,8 @@ block(`${page}-content`)(
                                                 block: 'user',
                                                 tag: 'span',
                                                 content: 'robot-srch-releaser'
-                                            }
+                                            },
+                                            {block: 'search-input'}
                                         ]
                                     },
                                     {
@@ -208,74 +208,7 @@ block(`${page}-content`)(
                                     {
                                         elem: 'body',
                                         tag: 'tbody',
-                                        content: [
-                                            contentMock.map(({
-                                                                 fileType,
-                                                                 name,
-                                                                 lastCommit,
-                                                                 commitMessage,
-                                                                 committer,
-                                                                 updated
-                                                             }) => ({
-                                                elem: 'row',
-                                                tag: 'tr',
-                                                content: [
-                                                    {
-                                                        elem: 'cell',
-                                                        mix: {
-                                                            elem: 'cell'
-                                                        },
-                                                        tag: 'td',
-                                                        content: {
-                                                            block: 'file',
-                                                            mods: {
-                                                                type: 'dir'
-                                                            },
-                                                            content: [
-                                                                {
-                                                                    block: 'file__icon',
-                                                                    mods: {
-                                                                        type: fileType
-                                                                    }
-                                                                },
-                                                                ` ${name} `
-                                                            ]
-                                                        }
-                                                    },
-                                                    {
-                                                        elem: 'cell',
-                                                        tag: 'td',
-                                                        content: {
-                                                            block: 'link',
-                                                            tag: 'a',
-                                                            attrs: {
-                                                                href: '#'
-                                                            },
-                                                            content: lastCommit
-                                                        }
-                                                    },
-                                                    {
-                                                        elem: 'cell',
-                                                        tag: 'td',
-                                                        content: commitMessage
-                                                    },
-                                                    {
-                                                        elem: 'cell',
-                                                        tag: 'td',
-                                                        content: {
-                                                            block: 'user',
-                                                            tag: 'span',
-                                                            content: committer
-                                                        }
-                                                    },
-                                                    {
-                                                        elem: 'cell',
-                                                        tag: 'td',
-                                                        content: updated
-                                                    }
-                                                ]
-                                            })),
-                                        ]
+                                        mix: {'block': 'files'},
                                     }
                                 ]
                             },
@@ -311,7 +244,7 @@ block(`${page}-content`)(
                                                         type: fileType
                                                     }
                                                 },
-                                                 ` ${name} `
+                                                ` ${name} `
                                             ]
                                         }
                                     },

@@ -1,6 +1,8 @@
 ({
     shouldDeps: [
         'page-deps',
-        'table'
+        'table',
+        'search-input',
+        'files'
     ]
 })
