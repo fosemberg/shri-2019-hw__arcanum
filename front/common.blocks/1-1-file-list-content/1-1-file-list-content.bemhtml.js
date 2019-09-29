@@ -126,7 +126,11 @@ block(`${page}-content`)(
                                                         tag: 'i'
                                                     }
                                                 ]
-                                            }
+                                            },
+                                            {
+                                                elem: 'search',
+                                                content: {block: 'search-input'}
+                                            },
                                         ]
                                     },
                                     {
@@ -155,8 +159,7 @@ block(`${page}-content`)(
                                                 block: 'user',
                                                 tag: 'span',
                                                 content: 'robot-srch-releaser'
-                                            },
-                                            {block: 'search-input'}
+                                            }
                                         ]
                                     },
                                     {

@@ -71,4 +71,8 @@
             margin-bottom: var(--space-s);
         }
     }
+
+    &:elem(search) {
+        margin-left: auto;
+    }
 }
