@@ -1,34 +1,25 @@
 class View {
-    constructor(el, models = {}) {
-        this._prepareRender = this._prepareRender(this);
-
-        this._models = models;
+    constructor(el, store) {
         this._el = el;
-        this._prepareRender();
-        this._subscribe();
+        this._store = store;
+        this._unsubscribe = store.subscribe(
+            this._prepareRender.bind(this)
+        );
+        this._prepareRender(store.getState());
     }
 
-    _subscribe() {
-        Object.values(this._models).forEach(model => {
-            model.addEventListener('model:change', this._prepareRender);
-        });
+    _prepareRender(state) {
+        this._el.innerHTML = this.render(state);
     }
 
-    _unsubscribe() {
-        Object.values(this._models).forEach(model => {
-            model.removeEventListener('model:change', this._prepareRender);
-        })
-    }
-
-    prepareRender() {
-        const modelsData = Object.keys(this._models).reduce((acc, key) => {
-            acc[key] = this._models[key].getState();
-            return acc;
-        })
+    render() {
+        throw new Error('This method should be overridden');
     }
 
     destroy() {
-        this._unsubscribe();
         this._el.innerHTML = '';
+        this._unsubscribe();
     }
 }
+
+export default View;

@@ -5,5 +5,6 @@ module.exports = {
     head: [
         {elem: 'css', url: `${page}.css`},
     ],
+    scripts: [{ elem: 'js', url: `${page}.min.js` }],
     content: {block: `${page}-content`}
 }
