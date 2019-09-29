@@ -3,6 +3,7 @@
         'page-deps',
         'table',
         'search-input',
-        'files'
+        'desktop-files',
+        'touch-files',
     ]
 })

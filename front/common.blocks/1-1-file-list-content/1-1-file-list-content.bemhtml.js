@@ -208,89 +208,11 @@ block(`${page}-content`)(
                                     {
                                         elem: 'body',
                                         tag: 'tbody',
-                                        mix: {'block': 'files'},
+                                        mix: {'block': 'desktop-files'},
                                     }
                                 ]
                             },
-                            contentMock.map(({
-                                                 fileType,
-                                                 name,
-                                                 lastCommit,
-                                                 commitMessage,
-                                                 committer,
-                                                 updated
-                                             }) => ({
-                                block: 'git-log-row',
-                                mods: {
-                                    hide: 'desktop',
-                                    border: 'bottom',
-                                    padding: 'both'
-                                },
-                                content: [
-                                    {
-                                        block: 'git-log-row__item',
-                                        mods: {
-                                            padding: 'both'
-                                        },
-                                        content: {
-                                            block: 'file',
-                                            mods: {
-                                                type: fileType
-                                            },
-                                            content: [
-                                                {
-                                                    block: 'file__icon',
-                                                    mods: {
-                                                        type: fileType
-                                                    }
-                                                },
-                                                ` ${name} `
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        block: 'git-log-row__item',
-                                        mods: {
-                                            display: 'flex',
-                                            padding: 'both'
-                                        },
-                                        content: {
-                                            block: 'git-log-row__message',
-                                            tag: 'span',
-                                            content: commitMessage
-                                        }
-                                    },
-                                    {
-                                        block: 'git-log-row__item',
-                                        mods: {
-                                            padding: 'both'
-                                        },
-                                        content: [
-                                            {
-                                                block: 'link',
-                                                tag: 'a',
-                                                attrs: {
-                                                    href: '#'
-                                                },
-                                                content: lastCommit
-                                            },
-                                            ` by ${committer}, ${updated} `
-                                        ]
-                                    },
-                                    {
-                                        block: 'git-log-row__arrow',
-                                        mix: {
-                                            block: 'arrow',
-                                            mods: {
-                                                state: 'right',
-                                                color: 'faded',
-                                                size: 'l'
-                                            }
-                                        },
-                                        tag: 'i'
-                                    }
-                                ]
-                            })),
+                            {block: 'touch-files'}
                         ]
                     },
                     {block: 'footer'}

@@ -6,11 +6,10 @@ class SearchInput extends View {
     }
 
     _onInput(event) {
-        const action = setSearchQueryAction(event.target.value)
-        console.log(action);
-        this._store.dispatch(action);
+        this._store.dispatch(setSearchQueryAction(event.target.value));
     }
     render({searchQuery}) {
+        console.log('searchQuery', searchQuery);
         return `
         <input class="input__control i-bem input__control_js_inited" value="${searchQuery}" placeholder="placeholder">
         `

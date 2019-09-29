@@ -1,18 +1,11 @@
-const SET_NAME = 'SET_NAME';
 const SET_SEARCH_QUERY = 'SET_SEARCH_QUERY';
 
 const createAction = (type, payload) => ({type, payload})
 
-const setNameAction = name => createAction(SET_NAME, name);
 const setSearchQueryAction = searchQuery => createAction(SET_SEARCH_QUERY, searchQuery)
 
 const reducer = (state, action) => {
     switch (action.type) {
-        case SET_NAME:
-            return {
-                ...state,
-                name: action.payload
-            };
         case SET_SEARCH_QUERY:
             return {
                 ...state,
@@ -20,6 +13,7 @@ const reducer = (state, action) => {
             }
         case INIT: {
             return {
+                searchQuery: '',
                 files: [
                     {
                         fileType: 'dir',
@@ -62,8 +56,6 @@ const reducer = (state, action) => {
                         updated: 'Dec 29, 2017'
                     },
                 ],
-                name: 'Anonymous',
-                searchQuery: '',
             }
         }
         default:
