@@ -70,6 +70,9 @@ app.get('/api/repos/:repositoryId',
                             fileType: arr[1] === 'tree' ? 'dir' : 'file',
                             lastCommit: arr[2].substring(0,6),
                             name: arr[3],
+                            commitMessage: '[vcs] move http to arc',
+                            committer: 'noxoomo',
+                            updated: '4 s ago'
                         }
                     }
                 )
