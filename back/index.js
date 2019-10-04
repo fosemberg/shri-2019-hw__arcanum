@@ -1,7 +1,6 @@
 const app = require('./expressApp');
 
 
-
 const {
     execCommandWithRes,
     arrayFromOut,
@@ -61,9 +60,19 @@ app.get('/api/repos/:repositoryId',
     ({params: {repositoryId}}, res) =>
         execCommandWithRes(
             `cd ${PATH_TO_REPOS}/${repositoryId} &&
-            ls`,
+            git ls-tree HEAD --full-tree`,
             res,
-            arrayFromOut
+            out => arrayFromOut(out)
+                .map(str => {
+                        const arr = str.replace('	', ' ').split(' ');
+                        return {
+                            num: arr[0],
+                            type: arr[1],
+                            sha: arr[2],
+                            name: arr[3],
+                        }
+                    }
+                )
         )
 );
 
@@ -122,7 +131,7 @@ app.post('/api/repos/:repositoryId',
         console.log(repositoryId, url);
         execCommandWithRes(
             `cd ${PATH_TO_REPOS} &&
-              git clone ${url.replace(/https?(:\/\/)/,'git$1')} ${repositoryId} && 
+              git clone ${url.replace(/https?(:\/\/)/, 'git$1')} ${repositoryId} && 
               echo '${createMessageObjectString(MESSAGE.REPOSITORY_CLONED)}'`,
             res,
             x => JSON.parse(x),
@@ -137,7 +146,7 @@ app.post('/api/repos',
     ({body: {url}}, res) =>
         execCommandWithRes(
             `cd ${PATH_TO_REPOS} &&
-                git clone ${url.replace(/https?(:\/\/)/,'git$1')} && 
+                git clone ${url.replace(/https?(:\/\/)/, 'git$1')} && 
                 echo '${createMessageObjectString(MESSAGE.REPOSITORY_CLONED)}'`,
             res,
             x => JSON.parse(x),
