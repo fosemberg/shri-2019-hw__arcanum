@@ -67,8 +67,8 @@ app.get('/api/repos/:repositoryId',
                         const arr = str.replace('	', ' ').split(' ');
                         return {
                             num: arr[0],
-                            type: arr[1],
-                            sha: arr[2],
+                            fileType: arr[1] === 'tree' ? 'dir' : 'file',
+                            lastCommit: arr[2].substring(0,6),
                             name: arr[3],
                         }
                     }
