@@ -2,7 +2,7 @@ class DesktopFiles extends View {
     render({searchQuery, files}) {
         return files
             .filter(file => Object.values(file)
-                .filter(el => ~el.indexOf(searchQuery))
+                .filter(el => ~el.toLowerCase().indexOf(searchQuery.toLowerCase()))
                 .length !== 0
             )
             .reduce((accum, {
