@@ -7,8 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "back start": "cd back && npm run start",
-    "front start": "cd front && npm run start",
+    "back_start": "cd back && npm run start",
     "install": "cd back && npm i && cd ../front && npm i && cd .."
   },
   "repository": {
