@@ -1,5 +1,6 @@
 ({
     mustDeps: [
-        'redux'
+        'redux',
+        'redux-thunk',
     ]
 })
