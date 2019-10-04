@@ -31,7 +31,7 @@ class Store {
         this._notifyListeners();
     }
 
-    dispatch(action) {
+    dispatch = (action) => {
         this._middleware({
             dispatch: this.dispatchWithoutMiddleWare.bind(this),
             getState: this._state
