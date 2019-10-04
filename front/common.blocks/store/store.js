@@ -63,4 +63,4 @@ const reducer = (state, action) => {
     }
 }
 
-const store = new Store(reducer);
+const store = new Store(reducer, thunk);
