@@ -1,8 +1,12 @@
 const INIT = '@@init';
 
 class Store {
-    constructor(reducer) {
+    constructor(
+        reducer,
+        middleware = dispatch => action => dispatch(action)
+    ) {
         this._reducer = reducer;
+        this._middleware = middleware;
         this._state = undefined;
         this._listeners = [];
         this.dispatch({
@@ -22,9 +26,13 @@ class Store {
         };
     }
 
-    dispatch(action) {
+    dispatchWithoutMiddleWare(action) {
         this._state = this._reducer(this._state, action);
         this._notifyListeners();
+    }
+
+    dispatch(action) {
+        this._middleware(this.dispatchWithoutMiddleWare.bind(this), this._state)(action);
     }
 
     _notifyListeners() {

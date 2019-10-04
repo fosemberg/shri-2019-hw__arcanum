@@ -1,6 +1,5 @@
 class TouchFiles extends View {
     render({searchQuery, files}) {
-        console.log(searchQuery);
         return files
             .filter(file => Object.values(file)
                 .filter(el => ~el.indexOf(searchQuery))

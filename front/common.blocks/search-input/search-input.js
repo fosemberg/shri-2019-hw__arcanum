@@ -10,7 +10,6 @@ class SearchInput extends View {
     }
 
     render({searchQuery}) {
-        console.log('searchQuery', searchQuery);
         return `
         <input class="input__control i-bem input__control_js_inited" value="${searchQuery}" placeholder="placeholder">
         `
