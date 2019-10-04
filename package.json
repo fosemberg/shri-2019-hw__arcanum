@@ -1,0 +1,25 @@
+{
+  "name": "shri-2019-hw__arcanum",
+  "version": "1.0.0",
+  "description": "Проект создан исключительно в обучающих целях. Основная задача: повторить функциональность внутреннего проекта yandex: Arcanum.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "back start": "cd back && npm run start",
+    "front start": "cd front && npm run start",
+    "install": "cd back && npm i && cd ../front && npm i && cd ..",
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fosemberg/shri-2019-hw__arcanum.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fosemberg/shri-2019-hw__arcanum/issues"
+  },
+  "homepage": "https://github.com/fosemberg/shri-2019-hw__arcanum#readme"
+}
