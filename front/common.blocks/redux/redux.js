@@ -3,7 +3,7 @@ const INIT = '@@init';
 class Store {
     constructor(
         reducer,
-        middleware = ({dispatch}) => action => dispatch(action)
+        middleware,
     ) {
         this._reducer = reducer;
         this._middleware = middleware;
@@ -32,7 +32,7 @@ class Store {
     }
 
     dispatch = (action) => {
-        this._middleware({
+        this._middleware && this._middleware({
             dispatch: this.dispatchWithoutMiddleWare.bind(this),
             getState: this._state
         })(action);
