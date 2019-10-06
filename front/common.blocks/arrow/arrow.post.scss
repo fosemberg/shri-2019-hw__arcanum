@@ -15,7 +15,7 @@
         transform: rotate(45deg);
     }
 
-    &:modstate (left) {
+    &:mod(state left) {
         transform: rotate(-135deg);
     }
 
