@@ -63,8 +63,13 @@ const kebabToPascal = string => string.split('-')
     .map(makeStartWithUpperCase)
     .join('');
 
-const distFolder = 'dist';
+const mkdirp = (dir) => {
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir);
+    }
+};
 
+const distFolder = 'dist';
 let blockName = '';
 let blockDir = '';
 
@@ -88,7 +93,9 @@ export default ${blockName};
 const createElem = (blockName, blockDir, elemName, elemContent) => {
     const fullElemName = `${blockName}-${elemName}`;
     const elemDir = `${blockDir}/-${elemName}`;
-    fs.mkdirSync(elemDir);
+
+    mkdirp(elemDir);
+    fs.writeFileSync(`${elemDir}/${fullElemName}.js`, elemContent);
 };
 
 gulp.task('css', function () {
