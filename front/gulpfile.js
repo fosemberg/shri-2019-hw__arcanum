@@ -91,18 +91,24 @@ const ${kebabToPascal(name)} = () => (
 export default ${kebabToPascal(name)};`
 );
 
+coverCssWithParent = (parentName, content) => (
+`.${parentName} {
+  ${content}
+}`
+);
+
 const createJsxBlock = (blockName, blockDir) => {
     mkdirp(blockDir);
     fs.writeFileSync(`${blockDir}/${blockName}.js`, createJsx(blockName));
 };
 
-const createElem = (blockName, blockDir, elemName, elemContent) => {
-    const elemDir = `${blockDir}/-${elemName}`;
-    const fullElemName = `${blockName}-${elemName}`;
+const createElem = (parentName, parentDir, name, content) => {
+    const elemDir = `${parentDir}/-${name}`;
+    const fullElemName = `${parentName}-${name}`;
 
     mkdirp(elemDir);
     fs.writeFileSync(`${elemDir}/${fullElemName}.js`, createJsx(fullElemName));
-    fs.writeFileSync(`${elemDir}/${fullElemName}.scss`, elemContent);
+    fs.writeFileSync(`${elemDir}/${fullElemName}.scss`, coverCssWithParent(parentName, content));
 };
 
 const createMod = (parentName, parentDir, nameValue, content) => {
@@ -113,7 +119,7 @@ const createMod = (parentName, parentDir, nameValue, content) => {
 
     mkdirp(modDir);
     fs.writeFileSync(`${modDir}/${fileName}.js`, createJsx(fileName));
-    fs.writeFileSync(`${modDir}/${fileName}.scss`, content);
+    fs.writeFileSync(`${modDir}/${fileName}.scss`, coverCssWithParent(parentName, content));
 };
 
 mkdirp(distFolder);
