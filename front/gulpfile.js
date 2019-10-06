@@ -69,35 +69,54 @@ const mkdirp = (dir) => {
     }
 };
 
+const getBetweenTwoFind = (str, start, end) => {
+    const startPart = str.substr(str.indexOf(start));
+    return startPart.substr(0, startPart.indexOf(end) + end.length);
+};
+
 const distFolder = 'dist';
+const oneTab = '    ';
 let blockName = '';
 let blockDir = '';
 
-const createJSX = (blockName, blockDir) => {
-    const jsxName = `${blockName}.js`;
-    const jsxData = `import React from 'react';
-import './${blockName}.scss';
 
-const ${blockName} = () => (
-  <div className="${blockName}"></div>
+const createJsx = name => (
+`import React from 'react';
+import './${name}.scss';
+
+const ${kebabToPascal(name)} = () => (
+  <div className="${name}"></div>
 );
 
-export default ${blockName};
-`;
-    const jsxDirname = `${blockDir}/${jsxName}`;
-    // fs.mkdirSync(jsxDirname);
-    console.log(blockDir);
-    fs.writeFileSync(jsxDirname, jsxData);
+export default ${kebabToPascal(name)};`
+);
+
+const createJsxBlock = (blockName, blockDir) => {
+    mkdirp(blockDir);
+    fs.writeFileSync(`${blockDir}/${blockName}.js`, createJsx(blockName));
 };
 
 const createElem = (blockName, blockDir, elemName, elemContent) => {
-    const fullElemName = `${blockName}-${elemName}`;
     const elemDir = `${blockDir}/-${elemName}`;
+    const fullElemName = `${blockName}-${elemName}`;
 
     mkdirp(elemDir);
-    fs.writeFileSync(`${elemDir}/${fullElemName}.js`, elemContent);
+    fs.writeFileSync(`${elemDir}/${fullElemName}.js`, createJsx(fullElemName));
+    fs.writeFileSync(`${elemDir}/${fullElemName}.scss`, elemContent);
 };
 
+const createMod = (parentName, parentDir, nameValue, content) => {
+    const [modName, modValue] = nameValue.split(' ');
+    const modFullName = `${modName}${modValue ? `_${modValue}`: ''}`;
+    const fileName = `${parentName}_${modFullName}`;
+    const modDir = `${parentDir}/_${modName}`;
+
+    mkdirp(modDir);
+    fs.writeFileSync(`${modDir}/${fileName}.js`, createJsx(fileName));
+    fs.writeFileSync(`${modDir}/${fileName}.scss`, content);
+};
+
+mkdirp(distFolder);
 gulp.task('css', function () {
     return gulp.src('./common.blocks/**/*.scss')
         // .pipe(postcss([rebemCss]))
@@ -115,7 +134,7 @@ gulp.task('css', function () {
             console.log(blockDir);
 
         }))
-        .pipe(gulpFn(() => createJSX(blockName, blockDir)))
+        .pipe(gulpFn(() => createJsxBlock(blockName, blockDir)))
         .pipe(replace(/^(\..)/, function (match, p1, offset, string) {
             return p1.toUpperCase();
         }))
@@ -124,8 +143,15 @@ gulp.task('css', function () {
             // See http://mdn.io/string.replace#Specifying_a_function_as_a_parameter
             // console.log('Found ' + match + ' with param ' + p1 + ' at ' + offset + ' inside of ' + string);
             const elemName = kebabToPascal(p1);
-            createElem(blockName, blockDir, elemName, 'some');
-            return elemName;
+            const content = getBetweenTwoFind(string, `&:elem(${p1})`, `\n${oneTab}}`);
+            createElem(blockName, blockDir, elemName, content);
+            return `&:elem(${p1}) {`;
+        }))
+        .pipe(replace(/\n    &:mod\(([^)]+)\) {/g, function(match, p1, offset, string) {
+            const modNameValue = p1;
+            const content = getBetweenTwoFind(string, `&:mod(${p1})`, `\n${oneTab}}`);
+            createMod(blockName, blockDir, modNameValue, content);
+            return `${oneTab}&:mod(${p1}) {`;
         }))
         .pipe(gulp.dest(distFolder));
 });
