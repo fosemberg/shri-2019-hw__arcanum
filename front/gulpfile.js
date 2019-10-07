@@ -14,7 +14,6 @@ const gulpOneOf = require('gulp-one-of');
 const uglify = require('gulp-uglify');
 
 const bemxjst = require('gulp-bem-xjst');
-const replace = require('gulp-replace');
 const gulpFn  = require('gulp-fn');
 const modifyFile  = require('gulp-modify-file');
 
@@ -70,11 +69,6 @@ const mkdirp = (dir) => {
     }
 };
 
-const getBetweenTwoFind = (str, start, end) => {
-    const startPart = str.substr(str.indexOf(start));
-    return startPart.substr(0, startPart.indexOf(end) + end.length);
-};
-
 const cutFromString = (str, start, end) => {
     const startPos = str.indexOf(start);
     if (!~startPos) return {subStr: false, restStr: str};
@@ -99,10 +93,7 @@ const cutArrayFromString = (str, start, end) => {
     }
 };
 
-// str = 'some {123} {456} 2 {789} 1 skldf 2';
-// cutArrayFromString(str, '{', '}')
-
-const distFolder = 'dist';
+const distFolder = 'dist/components';
 const oneTab = '    ';
 let blockName = '';
 let blockDir = '';
@@ -112,8 +103,8 @@ const createJsx = name => (
 `import React from 'react';
 import './${name}.scss';
 
-const ${kebabToPascal(name)} = () => (
-  <div className="${name}"></div>
+const ${kebabToPascal(name)} = (props) => (
+  <div className="${name}">{props.children}</div>
 );
 
 export default ${kebabToPascal(name)};`
@@ -165,10 +156,10 @@ const createMod = (parentName, parentDir, content) => {
     fs.writeFileSync(`${modDir}/${fileName}.scss`, coverCssWithParent(parentName, _content));
 };
 
+mkdirp('dist');
 mkdirp(distFolder);
-gulp.task('css', function () {
+gulp.task('convert_to_react', function () {
     return gulp.src('./common.blocks/**/*.scss')
-        // .pipe(postcss([rebemCss]))
         .pipe(rename(function (path) {
             let {dirname, basename, extname} = path;
 
