@@ -126,19 +126,7 @@ const oneTab = '    ';
 let blockName = '';
 let blockDir = '';
 
-
-const createJsx = name => (
-    `import React from 'react';
-import './${name}.scss';
-
-const ${kebabToPascal(name)} = (props) => (
-  <div className="${name}">{props.children}</div>
-);
-
-export default ${kebabToPascal(name)};`
-);
-
-const createBlockJsx = name => {
+const createBlockOrElemJsx = name => {
     const jsName = kebabToPascal(name);
     const cnName = `cn${jsName}`;
 
@@ -162,9 +150,9 @@ coverCssWithParent = (parentName, content) => (
 }`
 );
 
-const createJsxBlock = (blockName, blockDir) => {
+const createBlock = (blockName, blockDir) => {
     mkdirp(blockDir);
-    fs.writeFileSync(`${blockDir}/${blockName}.js`, createBlockJsx(blockName));
+    fs.writeFileSync(`${blockDir}/${blockName}.js`, createBlockOrElemJsx(blockName));
 };
 
 const createElem = (parentName, parentDir, content) => {
@@ -181,7 +169,7 @@ const createElem = (parentName, parentDir, content) => {
     let obj = cutArrayFromString(_content, '&:mod\(', `\n${oneTab}${oneTab}}`);
     obj.subStrs.forEach(subStr => createMod(fullElemName, elemDir, subStr));
 
-    fs.writeFileSync(`${elemDir}/${fullElemName}.js`, createJsx(fullElemName));
+    fs.writeFileSync(`${elemDir}/${fullElemName}.js`, createBlockOrElemJsx(fullElemName));
     fs.writeFileSync(`${elemDir}/${fullElemName}.scss`, coverCssWithParent(parentName, obj.restStr));
 };
 
@@ -230,7 +218,7 @@ gulp.task('convert_to_react', function () {
             console.log(blockDir);
 
         }))
-        .pipe(gulpFn(() => createJsxBlock(blockName, blockDir)))
+        .pipe(gulpFn(() => createBlock(blockName, blockDir)))
         .pipe(modifyFile((content, path, file) => {
             let obj = cutArrayFromString(content, '&:elem\(', `\n${oneTab}}`);
             obj.subStrs.forEach(subStr => createElem(blockName, blockDir, subStr));
