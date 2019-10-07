@@ -63,12 +63,23 @@ const kebabToPascal = string => string.split('-')
     .map(makeStartWithUpperCase)
     .join('');
 
+/**
+ * create dir if not exist
+ * @param dir - path to dir
+ */
 const mkdirp = (dir) => {
     if (!fs.existsSync(dir)){
         fs.mkdirSync(dir);
     }
 };
 
+/**
+ * cut from string peace, that start on @param start and end on @param end
+ * @param str - string to find peaces
+ * @param start - on what this string should to start
+ * @param end - on what this string should to end
+ * @returns {{restStr: string, subStr: boolean}|{restStr: string, subStr: string}}
+ */
 const cutFromString = (str, start, end) => {
     const startPos = str.indexOf(start);
     if (!~startPos) return {subStr: false, restStr: str};
@@ -79,6 +90,13 @@ const cutFromString = (str, start, end) => {
     return {subStr,restStr};
 };
 
+/**
+ * cut from string peaces, that start on @param start and end on @param end
+ * @param str - string to find peaces
+ * @param start - on what this string should to start
+ * @param end - on what this string should to end
+ * @returns {{restStr: string, subStrs: boolean}|{restStr: string, subStrs: string[]}}
+ */
 const cutArrayFromString = (str, start, end) => {
     let obj = cutFromString(str, start, end);
     const subStrs = [];
