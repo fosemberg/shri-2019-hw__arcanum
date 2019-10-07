@@ -130,18 +130,22 @@ const createJsxBlock = (blockName, blockDir) => {
     fs.writeFileSync(`${blockDir}/${blockName}.js`, createJsx(blockName));
 };
 
-
-// TODO: making mods in elements
 const createElem = (parentName, parentDir, content) => {
     const match = content.match(/&:elem\(([^)]+)\)/);
     if (!match) return;
     const name = kebabToPascal(match[1]);
+    const _content = content.replace(/&:elem\(([^)]+)\)/, `&.${name}`);
     const elemDir = `${parentDir}/-${name}`;
     const fullElemName = `${parentName}-${name}`;
 
     mkdirp(elemDir);
+
+    // find mods inside
+    let obj = cutArrayFromString(_content, '&:mod\(', `\n${oneTab}${oneTab}}`);
+    obj.subStrs.forEach(subStr => createMod(fullElemName, elemDir, subStr));
+
     fs.writeFileSync(`${elemDir}/${fullElemName}.js`, createJsx(fullElemName));
-    fs.writeFileSync(`${elemDir}/${fullElemName}.scss`, coverCssWithParent(parentName, content));
+    fs.writeFileSync(`${elemDir}/${fullElemName}.scss`, coverCssWithParent(parentName, obj.restStr));
 };
 
 const createMod = (parentName, parentDir, content) => {
@@ -150,12 +154,15 @@ const createMod = (parentName, parentDir, content) => {
     const nameValue = match[1];
     const [modName, modValue] = nameValue.split(' ');
     const modFullName = `${modName}${modValue ? `_${modValue}`: ''}`;
+
+    const _content = content.replace(/&:mod\(([^)]+)\)/, `&.${modFullName}`);
+
     const fileName = `${parentName}_${modFullName}`;
     const modDir = `${parentDir}/_${modName}`;
 
     mkdirp(modDir);
     fs.writeFileSync(`${modDir}/${fileName}.js`, createJsx(fileName));
-    fs.writeFileSync(`${modDir}/${fileName}.scss`, coverCssWithParent(parentName, content));
+    fs.writeFileSync(`${modDir}/${fileName}.scss`, coverCssWithParent(parentName, _content));
 };
 
 mkdirp(distFolder);
@@ -184,7 +191,9 @@ gulp.task('css', function () {
             obj = cutArrayFromString(obj.restStr, '&:mod\(', `\n${oneTab}}`);
             obj.subStrs.forEach(subStr => createMod(blockName, blockDir, subStr));
 
-            return obj.restStr;
+            const _content = obj.restStr.replace(/^:block\(([^)]+)\)/, `.${blockName}`);
+
+            return _content;
         }))
         .pipe(gulp.dest(distFolder));
 });
