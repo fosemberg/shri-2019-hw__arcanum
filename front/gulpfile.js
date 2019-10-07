@@ -126,7 +126,7 @@ const oneTab = '    ';
 let blockName = '';
 let blockDir = '';
 
-const createBlockOrElemJsx = name => {
+const createBlockOrElemJsx = (name, blockName = name) => {
     const jsName = kebabToPascal(name);
     const cnName = `cn${jsName}`;
 
@@ -135,7 +135,7 @@ const createBlockOrElemJsx = name => {
 import {cn} from "@bem-react/classname";
 import './${name}.scss';
 
-export const ${cnName} = cn('${jsName}');
+export const ${cnName} = cn('${name}');
 
 const ${jsName} = ({className, children}) => (
   <div className={${cnName}({}, [className])}>{children}</div>
@@ -159,7 +159,7 @@ const createElem = (parentName, parentDir, content) => {
     const match = content.match(/&:elem\(([^)]+)\)/);
     if (!match) return;
     const name = kebabToPascal(match[1]);
-    const _content = content.replace(/&:elem\(([^)]+)\)/, `&.${name}`);
+    const _content = content.replace(/&:elem\(([^)]+)\)/, `&-${name}`);
     const elemDir = `${parentDir}/-${name}`;
     const fullElemName = `${parentName}-${name}`;
 
@@ -173,13 +173,13 @@ const createElem = (parentName, parentDir, content) => {
     fs.writeFileSync(`${elemDir}/${fullElemName}.scss`, coverCssWithParent(parentName, obj.restStr));
 };
 
-const createModJsx = (blockName, modName, modValue, fileName) => {
+const createModJsx = (parentName, modName, modValue, fileName) => {
     const jsName = toPascal(fileName);
     return(
         `import { withBemMod } from '@bem-react/core';
 import './${fileName}.scss';
 
-export const ${jsName} = withBemMod('${blockName}', { ${modName}: '${modValue}'})`
+export const ${jsName} = withBemMod('${parentName}', { ${modName}: '${modValue}'})`
     )
 }
 
@@ -196,7 +196,7 @@ const createMod = (parentName, parentDir, content) => {
     const modDir = `${parentDir}/_${modName}`;
 
     mkdirp(modDir);
-    fs.writeFileSync(`${modDir}/${fileName}.js`, createModJsx(blockName, modName, modValue, fileName));
+    fs.writeFileSync(`${modDir}/${fileName}.js`, createModJsx(parentName, modName, modValue, fileName));
     fs.writeFileSync(`${modDir}/${fileName}.scss`, coverCssWithParent(parentName, _content));
 };
 

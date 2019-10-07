@@ -4,10 +4,10 @@ block('footer')(
             return [
                 {
                     elem: 'item',
-                    mix: {
-                        block: 'footer__caption'
-                    },
-                    content: ' Trade secrets of Yandex LLC. 16, Lev Tolstoy Str.,Moscow, Russia, 119021 '
+                    content: {
+                        elem: 'caption',
+                        content: ' Trade secrets of Yandex LLC. 16, Lev Tolstoy Str.,Moscow, Russia, 119021 '
+                    }
                 },
                 {
                     elem: 'item',
