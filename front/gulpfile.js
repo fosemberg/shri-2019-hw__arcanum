@@ -14,8 +14,8 @@ const gulpOneOf = require('gulp-one-of');
 const uglify = require('gulp-uglify');
 
 const bemxjst = require('gulp-bem-xjst');
-const gulpFn  = require('gulp-fn');
-const modifyFile  = require('gulp-modify-file');
+const gulpFn = require('gulp-fn');
+const modifyFile = require('gulp-modify-file');
 
 const bemhtml = bemxjst.bemhtml;
 const toHtml = bemxjst.toHtml;
@@ -59,16 +59,26 @@ const builder = Builder({
 const rename = require("gulp-rename");
 
 const makeStartWithUpperCase = str => str[0].toUpperCase() + str.slice(1);
-const kebabToPascal = string => string.split('-')
-    .map(makeStartWithUpperCase)
-    .join('');
+const kebabToPascal = string =>
+    string
+        .split('-')
+        .map(makeStartWithUpperCase)
+        .join('');
+
+const snakeToPascal = string =>
+    string
+        .split('_')
+        .map(makeStartWithUpperCase)
+        .join('');
+
+const toPascal = string => kebabToPascal(snakeToPascal(string));
 
 /**
  * create dir if not exist
  * @param dir - path to dir
  */
 const mkdirp = (dir) => {
-    if (!fs.existsSync(dir)){
+    if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
     }
 };
@@ -87,7 +97,7 @@ const cutFromString = (str, start, end) => {
     if (!~endPos) return {subStr: false, restStr: str};
     const subStr = str.substring(startPos, endPos + end.length);
     const restStr = str.substr(0, startPos) + str.substring(endPos + end.length);
-    return {subStr,restStr};
+    return {subStr, restStr};
 };
 
 /**
@@ -101,7 +111,7 @@ const cutArrayFromString = (str, start, end) => {
     let obj = cutFromString(str, start, end);
     const subStrs = [];
 
-    while(obj.subStr) {
+    while (obj.subStr) {
         subStrs.push(obj.subStr);
         obj = cutFromString(obj.restStr, start, end);
     }
@@ -118,7 +128,7 @@ let blockDir = '';
 
 
 const createJsx = name => (
-`import React from 'react';
+    `import React from 'react';
 import './${name}.scss';
 
 const ${kebabToPascal(name)} = (props) => (
@@ -128,15 +138,33 @@ const ${kebabToPascal(name)} = (props) => (
 export default ${kebabToPascal(name)};`
 );
 
+const createBlockJsx = name => {
+    const jsName = kebabToPascal(name);
+    const cnName = `cn${jsName}`;
+
+    return (
+        `import React from 'react';
+import {cn} from "@bem-react/classname";
+import './${name}.scss';
+
+export const ${cnName} = cn('${jsName}');
+
+const ${jsName} = ({className, children}) => (
+  <div className={${cnName}({}, [className])}>{children}</div>
+);
+
+export default ${jsName};`)
+};
+
 coverCssWithParent = (parentName, content) => (
-`.${parentName} {
+    `.${parentName} {
   ${content}
 }`
 );
 
 const createJsxBlock = (blockName, blockDir) => {
     mkdirp(blockDir);
-    fs.writeFileSync(`${blockDir}/${blockName}.js`, createJsx(blockName));
+    fs.writeFileSync(`${blockDir}/${blockName}.js`, createBlockJsx(blockName));
 };
 
 const createElem = (parentName, parentDir, content) => {
@@ -157,20 +185,30 @@ const createElem = (parentName, parentDir, content) => {
     fs.writeFileSync(`${elemDir}/${fullElemName}.scss`, coverCssWithParent(parentName, obj.restStr));
 };
 
+const createModJsx = (blockName, modName, modValue, fileName) => {
+    const jsName = toPascal(fileName);
+    return(
+        `import { withBemMod } from '@bem-react/core';
+import './${fileName}.scss';
+
+export const ${jsName} = withBemMod('${blockName}', { ${modName}: '${modValue}'})`
+    )
+}
+
 const createMod = (parentName, parentDir, content) => {
     const match = content.match(/&:mod\(([^)]+)\)/);
     if (!match) return;
     const nameValue = match[1];
     const [modName, modValue] = nameValue.split(' ');
-    const modFullName = `${modName}${modValue ? `_${modValue}`: ''}`;
+    const modFullName = `${modName}${modValue ? `_${modValue}` : ''}`;
 
-    const _content = content.replace(/&:mod\(([^)]+)\)/, `&.${modFullName}`);
+    const _content = content.replace(/&:mod\(([^)]+)\)/, `&_${modFullName}`);
 
     const fileName = `${parentName}_${modFullName}`;
     const modDir = `${parentDir}/_${modName}`;
 
     mkdirp(modDir);
-    fs.writeFileSync(`${modDir}/${fileName}.js`, createJsx(fileName));
+    fs.writeFileSync(`${modDir}/${fileName}.js`, createModJsx(blockName, modName, modValue, fileName));
     fs.writeFileSync(`${modDir}/${fileName}.scss`, coverCssWithParent(parentName, _content));
 };
 

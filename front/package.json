@@ -36,6 +36,7 @@
     "gulp-debug": "^4.0.0",
     "gulp-fn": "0.0.3",
     "gulp-if": "^2.0.2",
+    "gulp-modify-file": "^1.0.1",
     "gulp-one-of": "^1.0.1",
     "gulp-postcss": "^7.0.1",
     "gulp-rename": "^1.4.0",
