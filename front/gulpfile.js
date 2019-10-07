@@ -16,6 +16,7 @@ const uglify = require('gulp-uglify');
 const bemxjst = require('gulp-bem-xjst');
 const replace = require('gulp-replace');
 const gulpFn  = require('gulp-fn');
+const modifyFile  = require('gulp-modify-file');
 
 const bemhtml = bemxjst.bemhtml;
 const toHtml = bemxjst.toHtml;
@@ -74,6 +75,33 @@ const getBetweenTwoFind = (str, start, end) => {
     return startPart.substr(0, startPart.indexOf(end) + end.length);
 };
 
+const cutFromString = (str, start, end) => {
+    const startPos = str.indexOf(start);
+    if (!~startPos) return {subStr: false, restStr: str};
+    const endPos = str.indexOf(end, startPos);
+    if (!~endPos) return {subStr: false, restStr: str};
+    const subStr = str.substring(startPos, endPos + end.length);
+    const restStr = str.substr(0, startPos) + str.substring(endPos + end.length);
+    return {subStr,restStr};
+};
+
+const cutArrayFromString = (str, start, end) => {
+    let obj = cutFromString(str, start, end);
+    const subStrs = [];
+
+    while(obj.subStr) {
+        subStrs.push(obj.subStr);
+        obj = cutFromString(obj.restStr, start, end);
+    }
+    return {
+        subStrs: subStrs,
+        restStr: obj.restStr
+    }
+};
+
+// str = 'some {123} {456} 2 {789} 1 skldf 2';
+// cutArrayFromString(str, '{', '}')
+
 const distFolder = 'dist';
 const oneTab = '    ';
 let blockName = '';
@@ -102,7 +130,12 @@ const createJsxBlock = (blockName, blockDir) => {
     fs.writeFileSync(`${blockDir}/${blockName}.js`, createJsx(blockName));
 };
 
-const createElem = (parentName, parentDir, name, content) => {
+
+// TODO: making mods in elements
+const createElem = (parentName, parentDir, content) => {
+    const match = content.match(/&:elem\(([^)]+)\)/);
+    if (!match) return;
+    const name = kebabToPascal(match[1]);
     const elemDir = `${parentDir}/-${name}`;
     const fullElemName = `${parentName}-${name}`;
 
@@ -111,7 +144,10 @@ const createElem = (parentName, parentDir, name, content) => {
     fs.writeFileSync(`${elemDir}/${fullElemName}.scss`, coverCssWithParent(parentName, content));
 };
 
-const createMod = (parentName, parentDir, nameValue, content) => {
+const createMod = (parentName, parentDir, content) => {
+    const match = content.match(/&:mod\(([^)]+)\)/);
+    if (!match) return;
+    const nameValue = match[1];
     const [modName, modValue] = nameValue.split(' ');
     const modFullName = `${modName}${modValue ? `_${modValue}`: ''}`;
     const fileName = `${parentName}_${modFullName}`;
@@ -141,23 +177,14 @@ gulp.task('css', function () {
 
         }))
         .pipe(gulpFn(() => createJsxBlock(blockName, blockDir)))
-        .pipe(replace(/^(\..)/, function (match, p1, offset, string) {
-            return p1.toUpperCase();
-        }))
-        .pipe(replace(/&:elem\(([^)]+)\) {/g, function(match, p1, offset, string) {
-            // Replace foobaz with barbaz and log a ton of information
-            // See http://mdn.io/string.replace#Specifying_a_function_as_a_parameter
-            // console.log('Found ' + match + ' with param ' + p1 + ' at ' + offset + ' inside of ' + string);
-            const elemName = kebabToPascal(p1);
-            const content = getBetweenTwoFind(string, `&:elem(${p1})`, `\n${oneTab}}`);
-            createElem(blockName, blockDir, elemName, content);
-            return `&:elem(${p1}) {`;
-        }))
-        .pipe(replace(/\n    &:mod\(([^)]+)\) {/g, function(match, p1, offset, string) {
-            const modNameValue = p1;
-            const content = getBetweenTwoFind(string, `&:mod(${p1})`, `\n${oneTab}}`);
-            createMod(blockName, blockDir, modNameValue, content);
-            return `${oneTab}&:mod(${p1}) {`;
+        .pipe(modifyFile((content, path, file) => {
+            let obj = cutArrayFromString(content, '&:elem\(', `\n${oneTab}}`);
+            obj.subStrs.forEach(subStr => createElem(blockName, blockDir, subStr));
+
+            obj = cutArrayFromString(obj.restStr, '&:mod\(', `\n${oneTab}}`);
+            obj.subStrs.forEach(subStr => createMod(blockName, blockDir, subStr));
+
+            return obj.restStr;
         }))
         .pipe(gulp.dest(distFolder));
 });
