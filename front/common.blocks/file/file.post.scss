@@ -3,13 +3,15 @@
     display: inline-flex;
     align-items: center;
 
-    &:mod(type) {
-        &:mod(dir), &:mod(branch) {
-            font-weight: bold;
-        }
+    &:mod(type dir) {
+        font-weight: bold;
+    }
 
-        &:mod(file) {
-        }
+    &:mod(type branch) {
+        font-weight: bold;
+    }
+
+    &:mod(type file) {
     }
 
     &:mod(weight bold) {

@@ -3,7 +3,7 @@ const GET_FILES_START = 'GET_FILES_START';
 const GET_FILES_SUCCESS = 'GET_FILES_SUCCESS';
 const GET_FILES_ERROR = 'GET_FILES_ERROR';
 
-const host = 'http://localhost:3000';
+const host = 'http://localhost:3009';
 const pathToFiles = 'api/repos/server-info';
 
 const createAction = (type, payload) => ({type, payload});
