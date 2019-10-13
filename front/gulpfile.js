@@ -130,22 +130,31 @@ let blockName = '';
 let blockDir = '';
 
 
-
 coverCssWithParent = (parentName, content) => (
     `.${parentName} {
   ${content}
 }`
 );
 
-const createBlockOrElemIndexTsx = (name, blockName = name) => {
+createInterfaceContentForMods = (mods, indent = '  ') =>
+    Object.keys(mods).reduce((accum, modName) => {
+        const modVals = mods[modName];
+        const modString = `${modName}?: '${modVals.join("' | '")}';`;
+        return `${accum}${indent}${modString}\n`;
+    }, '')
+        .slice(0, -1);
+
+const createBlockOrElemIndexTsx = (name, mods) => {
     const jsName = kebabToPascal(name);
     const interfaceName = `I${jsName}`;
     const cnName = `cn${jsName}`;
 
     return (
-        `import {cn} from "@bem-react/classname";
+        `import { IClassNameProps } from '@bem-react/core';
+import {cn} from "@bem-react/classname";
 
-export interface ${interfaceName} {
+export interface ${interfaceName} extends IClassNameProps {
+${createInterfaceContentForMods(mods)}
 }
 
 export const ${cnName} = cn('${name}');
@@ -153,18 +162,17 @@ export const ${cnName} = cn('${name}');
     )
 };
 
-const createBlockOrElemJsx = (name, blockName = name) => {
+const createBlockOrElemTsx = (name, blockName = name) => {
     const jsName = kebabToPascal(name);
-    // const interfaceName = `I${jsName}`;
+    const interfaceName = `I${jsName}`;
     const cnName = `cn${jsName}`;
 
     return (
         `import React from 'react';
-import {IClassNameProps} from "@bem-react/core";
-import {${cnName}} from "./index";
+import {${cnName}, ${interfaceName}} from "./index";
 import './${name}.scss';
 
-const ${jsName}: React.FC<IClassNameProps> = ({className, children}) => (
+const ${jsName}: React.FC<${interfaceName}> = ({className, children}) => (
   <div className={${cnName}({}, [className])}>{children}</div>
 );
 
@@ -173,8 +181,10 @@ export default ${jsName};`)
 
 const createBlock = (blockName, blockDir) => {
     mkdirp(blockDir);
-    fs.writeFileSync(`${blockDir}/${blockName}.tsx`, createBlockOrElemJsx(blockName));
-    fs.writeFileSync(`${blockDir}/index.tsx`, createBlockOrElemIndexTsx(blockName));
+    if (!allMods[`${blockName}`]) {
+        allMods[`${blockName}`] = {};
+    }
+    fs.writeFileSync(`${blockDir}/${blockName}.tsx`, createBlockOrElemTsx(blockName));
 };
 
 const createElem = (parentName, parentDir, content) => {
@@ -187,8 +197,11 @@ const createElem = (parentName, parentDir, content) => {
 
     mkdirp(elemDir);
 
-    fs.writeFileSync(`${elemDir}/${fullElemName}.tsx`, createBlockOrElemJsx(fullElemName));
-    fs.writeFileSync(`${elemDir}/index.tsx`, createBlockOrElemIndexTsx(fullElemName));
+    fs.writeFileSync(`${elemDir}/${fullElemName}.tsx`, createBlockOrElemTsx(fullElemName));
+
+    if (!allMods[`${fullElemName}`]) {
+        allMods[`${fullElemName}`] = {};
+    }
 
     // find mods inside
     let obj = cutArrayFromString(_content, '&:mod\(', `\n${oneTab}${oneTab}}`);
@@ -197,10 +210,24 @@ const createElem = (parentName, parentDir, content) => {
     fs.writeFileSync(`${elemDir}/${fullElemName}.scss`, coverCssWithParent(parentName, obj.restStr));
 };
 
-const createModJsx = (parentName, modName, modValue, fileName) => {
+allMods = {};
+
+const createModTsx = (parentName, modName, modValue, fileName) => {
     const jsName = toPascal(fileName);
     const interfaceName = `I${toPascal(parentName)}`;
-    return(
+
+    if (!allMods[`${parentName}`]) {
+        allMods[`${parentName}`] = {};
+    }
+    if (!allMods[`${parentName}`][`${modName}`]) {
+        allMods[`${parentName}`][`${modName}`] = [modValue];
+    } else {
+        allMods[`${parentName}`][`${modName}`].push(modValue);
+    }
+
+    (`${parentName}.tsx ${modName}: '${modValue}'`);
+
+    return (
         `import { withBemMod } from '@bem-react/core';
 import {${interfaceName}} from "../index";
 import './${fileName}.scss';
@@ -223,7 +250,7 @@ const createMod = (parentName, parentDir, content) => {
     const modDir = `${parentDir}/_${modNameForFile}`;
 
     mkdirp(modDir);
-    fs.writeFileSync(`${modDir}/${fileName}.tsx`, createModJsx(parentName, modNameForContent, modValue, fileName));
+    fs.writeFileSync(`${modDir}/${fileName}.tsx`, createModTsx(parentName, modNameForContent, modValue, fileName));
     fs.writeFileSync(`${modDir}/${fileName}.scss`, coverCssWithParent(parentName, _content));
 };
 
@@ -257,6 +284,31 @@ gulp.task('convert_to_react', function () {
         }))
         .pipe(gulp.dest(distFolder));
 });
+
+gulp.task('convert_to_react__all', gulp.series('convert_to_react', function () {
+    // console.log(mods);
+
+    Object.keys(allMods).forEach(blockOrElement => {
+        let pathToDir = distFolder;
+        let name = blockOrElement;
+        if (~blockOrElement.indexOf('-')) {
+            const [block, element] = blockOrElement.split('-');
+            pathToDir = `${pathToDir}/${block}/-${element}`;
+            name = toPascal(blockOrElement);
+            console.log(pathToDir)
+        } else {
+            pathToDir = `${pathToDir}/${blockOrElement}`;
+            console.log(pathToDir);
+        }
+
+        const mods = allMods[`${blockOrElement}`];
+
+        fs.writeFileSync(`${pathToDir}/index.tsx`, createBlockOrElemIndexTsx(name, mods));
+    });
+
+    console.log(allMods['Arrow']);
+    return Promise.resolve('Mods added');
+}));
 
 gulp.task('build', () => {
     return bundler('*.bundles/*')
