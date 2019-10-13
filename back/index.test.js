@@ -2,7 +2,7 @@ const axios = require(`axios`);
 
 const repositoryId = `server-info`;
 const url = `https://github.com/fosemberg/${repositoryId}.git`;
-const host = `http://localhost:3000`;
+const host = `http://localhost:3009`;
 
 const checkUrl = (
     url,

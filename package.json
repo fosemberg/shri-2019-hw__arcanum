@@ -21,7 +21,4 @@
     "url": "https://github.com/fosemberg/shri-2019-hw__arcanum/issues"
   },
   "homepage": "https://github.com/fosemberg/shri-2019-hw__arcanum#readme",
-  "devDependencies": {
-    "gulp-modify-file": "^1.0.1"
-  }
 }

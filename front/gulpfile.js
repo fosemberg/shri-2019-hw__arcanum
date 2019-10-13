@@ -59,6 +59,8 @@ const builder = Builder({
 const rename = require("gulp-rename");
 
 const makeStartWithUpperCase = str => str[0].toUpperCase() + str.slice(1);
+const makeStartWithLowerCase = str => str[0].toLowerCase() + str.slice(1);
+
 const kebabToPascal = string =>
     string
         .split('-')
@@ -72,6 +74,7 @@ const snakeToPascal = string =>
         .join('');
 
 const toPascal = string => kebabToPascal(snakeToPascal(string));
+const toCamelCase = string => makeStartWithLowerCase(toPascal(string));
 
 /**
  * create dir if not exist
@@ -121,28 +124,12 @@ const cutArrayFromString = (str, start, end) => {
     }
 };
 
-const distFolder = 'dist/components';
+const distFolder = 'dist/patterns';
 const oneTab = '    ';
 let blockName = '';
 let blockDir = '';
 
-const createBlockOrElemJsx = (name, blockName = name) => {
-    const jsName = kebabToPascal(name);
-    const cnName = `cn${jsName}`;
 
-    return (
-        `import React from 'react';
-import {cn} from "@bem-react/classname";
-import './${name}.scss';
-
-export const ${cnName} = cn('${name}');
-
-const ${jsName} = ({className, children}) => (
-  <div className={${cnName}({}, [className])}>{children}</div>
-);
-
-export default ${jsName};`)
-};
 
 coverCssWithParent = (parentName, content) => (
     `.${parentName} {
@@ -150,9 +137,44 @@ coverCssWithParent = (parentName, content) => (
 }`
 );
 
+const createBlockOrElemIndexTsx = (name, blockName = name) => {
+    const jsName = kebabToPascal(name);
+    const interfaceName = `I${jsName}`;
+    const cnName = `cn${jsName}`;
+
+    return (
+        `import {cn} from "@bem-react/classname";
+
+export interface ${interfaceName} {
+}
+
+export const ${cnName} = cn('${name}');
+`
+    )
+};
+
+const createBlockOrElemJsx = (name, blockName = name) => {
+    const jsName = kebabToPascal(name);
+    // const interfaceName = `I${jsName}`;
+    const cnName = `cn${jsName}`;
+
+    return (
+        `import React from 'react';
+import {IClassNameProps} from "@bem-react/core";
+import {${cnName}} from "./index";
+import './${name}.scss';
+
+const ${jsName}: React.FC<IClassNameProps> = ({className, children}) => (
+  <div className={${cnName}({}, [className])}>{children}</div>
+);
+
+export default ${jsName};`)
+};
+
 const createBlock = (blockName, blockDir) => {
     mkdirp(blockDir);
-    fs.writeFileSync(`${blockDir}/${blockName}.js`, createBlockOrElemJsx(blockName));
+    fs.writeFileSync(`${blockDir}/${blockName}.tsx`, createBlockOrElemJsx(blockName));
+    fs.writeFileSync(`${blockDir}/index.tsx`, createBlockOrElemIndexTsx(blockName));
 };
 
 const createElem = (parentName, parentDir, content) => {
@@ -165,21 +187,25 @@ const createElem = (parentName, parentDir, content) => {
 
     mkdirp(elemDir);
 
+    fs.writeFileSync(`${elemDir}/${fullElemName}.tsx`, createBlockOrElemJsx(fullElemName));
+    fs.writeFileSync(`${elemDir}/index.tsx`, createBlockOrElemIndexTsx(fullElemName));
+
     // find mods inside
     let obj = cutArrayFromString(_content, '&:mod\(', `\n${oneTab}${oneTab}}`);
     obj.subStrs.forEach(subStr => createMod(fullElemName, elemDir, subStr));
 
-    fs.writeFileSync(`${elemDir}/${fullElemName}.js`, createBlockOrElemJsx(fullElemName));
     fs.writeFileSync(`${elemDir}/${fullElemName}.scss`, coverCssWithParent(parentName, obj.restStr));
 };
 
 const createModJsx = (parentName, modName, modValue, fileName) => {
     const jsName = toPascal(fileName);
+    const interfaceName = `I${toPascal(parentName)}`;
     return(
         `import { withBemMod } from '@bem-react/core';
+import {${interfaceName}} from "../index";
 import './${fileName}.scss';
 
-export const ${jsName} = withBemMod('${parentName}', { ${modName}: '${modValue}'})`
+export const ${jsName} = withBemMod<${interfaceName}>('${parentName}', { ${modName}: '${modValue}'});`
     )
 }
 
@@ -187,16 +213,17 @@ const createMod = (parentName, parentDir, content) => {
     const match = content.match(/&:mod\(([^)]+)\)/);
     if (!match) return;
     const nameValue = match[1];
-    const [modName, modValue] = nameValue.split(' ');
-    const modFullName = `${modName}${modValue ? `_${modValue}` : ''}`;
+    const [modNameForFile, modValue] = nameValue.split(' ');
+    const modNameForContent = toCamelCase(modNameForFile);
+    const modFullNameForFile = `${modNameForFile}${modValue ? `_${modValue}` : ''}`;
 
-    const _content = content.replace(/&:mod\(([^)]+)\)/, `&_${modFullName}`);
+    const _content = content.replace(/&:mod\(([^)]+)\)/, `&_${modNameForContent}`);
 
-    const fileName = `${parentName}_${modFullName}`;
-    const modDir = `${parentDir}/_${modName}`;
+    const fileName = `${parentName}_${modFullNameForFile}`;
+    const modDir = `${parentDir}/_${modNameForFile}`;
 
     mkdirp(modDir);
-    fs.writeFileSync(`${modDir}/${fileName}.js`, createModJsx(parentName, modName, modValue, fileName));
+    fs.writeFileSync(`${modDir}/${fileName}.tsx`, createModJsx(parentName, modNameForContent, modValue, fileName));
     fs.writeFileSync(`${modDir}/${fileName}.scss`, coverCssWithParent(parentName, _content));
 };
 
@@ -215,8 +242,6 @@ gulp.task('convert_to_react', function () {
             path.basename = basename;
 
             blockDir = `${distFolder}/${blockName}`;
-            console.log(blockDir);
-
         }))
         .pipe(gulpFn(() => createBlock(blockName, blockDir)))
         .pipe(modifyFile((content, path, file) => {
