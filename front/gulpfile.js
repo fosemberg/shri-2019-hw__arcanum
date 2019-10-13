@@ -225,8 +225,6 @@ const createModTsx = (parentName, modName, modValue, fileName) => {
         allMods[`${parentName}`][`${modName}`].push(modValue);
     }
 
-    (`${parentName}.tsx ${modName}: '${modValue}'`);
-
     return (
         `import { withBemMod } from '@bem-react/core';
 import {${interfaceName}} from "../index";
@@ -243,8 +241,9 @@ const createMod = (parentName, parentDir, content) => {
     const [modNameForFile, modValue] = nameValue.split(' ');
     const modNameForContent = toCamelCase(modNameForFile);
     const modFullNameForFile = `${modNameForFile}${modValue ? `_${modValue}` : ''}`;
+    const modFullNameForContent = `${modNameForContent}${modValue ? `_${modValue}` : ''}`;
 
-    const _content = content.replace(/&:mod\(([^)]+)\)/, `&_${modNameForContent}`);
+    const _content = content.replace(/&:mod\(([^)]+)\)/, `&_${modFullNameForContent}`);
 
     const fileName = `${parentName}_${modFullNameForFile}`;
     const modDir = `${parentDir}/_${modNameForFile}`;
