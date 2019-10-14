@@ -289,11 +289,9 @@ gulp.task('convert_to_react__all', gulp.series('convert_to_react', function () {
 
     Object.keys(allMods).forEach(blockOrElement => {
         let pathToDir = distFolder;
-        let name = blockOrElement;
         if (~blockOrElement.indexOf('-')) {
             const [block, element] = blockOrElement.split('-');
             pathToDir = `${pathToDir}/${block}/-${element}`;
-            name = toPascal(blockOrElement);
             console.log(pathToDir)
         } else {
             pathToDir = `${pathToDir}/${blockOrElement}`;
@@ -302,7 +300,7 @@ gulp.task('convert_to_react__all', gulp.series('convert_to_react', function () {
 
         const mods = allMods[`${blockOrElement}`];
 
-        fs.writeFileSync(`${pathToDir}/index.tsx`, createBlockOrElemIndexTsx(name, mods));
+        fs.writeFileSync(`${pathToDir}/index.tsx`, createBlockOrElemIndexTsx(blockOrElement, mods));
     });
 
     console.log(allMods['Arrow']);
