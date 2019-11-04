@@ -128,8 +128,10 @@ const distFolder = 'dist';
 const distFullPath = `${distFolder}/components`;
 const inputFolder = 'mandala';
 const oneTab = '    ';
+const outputStylesExtension = 'styl';
 let blockName = '';
 let blockDir = '';
+
 
 
 coverCssWithParent = (parentName, content) => (
@@ -172,7 +174,7 @@ const createBlockOrElemTsx = (name, blockName = name) => {
     return (
         `import React from 'react';
 import {${cnName}, ${interfaceName}} from "./index";
-import './${name}.scss';
+import './${name}.${outputStylesExtension}';
 
 const ${jsName}: React.FC<${interfaceName}> = ({className, children}) => (
   <div className={${cnName}({}, [className])}>{children}</div>
@@ -209,7 +211,7 @@ const createElem = (parentName, parentDir, content) => {
     let obj = cutArrayFromString(_content, '&:mod\(', `\n${oneTab}${oneTab}}`);
     obj.subStrs.forEach(subStr => createMod(fullElemName, elemDir, subStr));
 
-    fs.writeFileSync(`${elemDir}/${fullElemName}.scss`, coverCssWithParent(parentName, obj.restStr));
+    fs.writeFileSync(`${elemDir}/${fullElemName}.${outputStylesExtension}`, coverCssWithParent(parentName, obj.restStr));
 };
 
 allMods = {};
@@ -230,7 +232,7 @@ const createModTsx = (parentName, modName, modValue, fileName) => {
     return (
         `import { withBemMod } from '@bem-react/core';
 import {${interfaceName}} from "../index";
-import './${fileName}.scss';
+import './${fileName}.${outputStylesExtension}';
 
 export const ${jsName} = withBemMod<${interfaceName}>('${parentName}', { ${modName}: '${modValue}'});`
     )
@@ -252,7 +254,7 @@ const createMod = (parentName, parentDir, content) => {
 
     mkdirp(modDir);
     fs.writeFileSync(`${modDir}/${fileName}.tsx`, createModTsx(parentName, modNameForContent, modValue, fileName));
-    fs.writeFileSync(`${modDir}/${fileName}.scss`, coverCssWithParent(parentName, _content));
+    fs.writeFileSync(`${modDir}/${fileName}.${outputStylesExtension}`, coverCssWithParent(parentName, _content));
 };
 
 mkdirp(distFolder);
@@ -268,6 +270,7 @@ gulp.task('convert_to_react', function () {
             basename = basename.replace('.post', '');
             basename = kebabToPascal(basename);
             path.basename = basename;
+            path.extname = `.${outputStylesExtension}`;
 
             blockDir = `${distFullPath}/${blockName}`;
         }))
