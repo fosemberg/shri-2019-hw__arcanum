@@ -124,7 +124,9 @@ const cutArrayFromString = (str, start, end) => {
     }
 };
 
-const distFolder = 'dist/patterns';
+const distFolder = 'dist';
+const distFullPath = `${distFolder}/components`;
+const inputFolder = 'mandala';
 const oneTab = '    ';
 let blockName = '';
 let blockDir = '';
@@ -253,10 +255,10 @@ const createMod = (parentName, parentDir, content) => {
     fs.writeFileSync(`${modDir}/${fileName}.scss`, coverCssWithParent(parentName, _content));
 };
 
-mkdirp('dist');
 mkdirp(distFolder);
+mkdirp(distFullPath);
 gulp.task('convert_to_react', function () {
-    return gulp.src('./common.blocks/**/*.scss')
+    return gulp.src(`./${inputFolder}/**/*.scss`)
         .pipe(rename(function (path) {
             let {dirname, basename, extname} = path;
 
@@ -267,7 +269,7 @@ gulp.task('convert_to_react', function () {
             basename = kebabToPascal(basename);
             path.basename = basename;
 
-            blockDir = `${distFolder}/${blockName}`;
+            blockDir = `${distFullPath}/${blockName}`;
         }))
         .pipe(gulpFn(() => createBlock(blockName, blockDir)))
         .pipe(modifyFile((content, path, file) => {
@@ -281,14 +283,14 @@ gulp.task('convert_to_react', function () {
 
             return _content;
         }))
-        .pipe(gulp.dest(distFolder));
+        .pipe(gulp.dest(distFullPath));
 });
 
 gulp.task('convert_to_react__all', gulp.series('convert_to_react', function () {
     // console.log(mods);
 
     Object.keys(allMods).forEach(blockOrElement => {
-        let pathToDir = distFolder;
+        let pathToDir = distFullPath;
         if (~blockOrElement.indexOf('-')) {
             const [block, element] = blockOrElement.split('-');
             pathToDir = `${pathToDir}/${block}/-${element}`;
