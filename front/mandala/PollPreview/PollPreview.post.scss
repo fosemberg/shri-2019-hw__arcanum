@@ -1,0 +1,7 @@
+:block(PollPreview) {
+    background: gray;
+
+    &:elem(text) {
+        color: white;
+    }
+}
