@@ -154,14 +154,14 @@ const createBlockOrElemIndexTsx = (name, mods) => {
     const cnName = `cn${jsName}`;
 
     return (
-        `import { IClassNameProps } from '@bem-react/core';
-import {cn} from "@bem-react/classname";
+        `import { IClassNameProps } from '@bem-react/core'
+import { cn } from '@bem-react/classname'
 
 export interface ${interfaceName} extends IClassNameProps {
 ${createInterfaceContentForMods(mods)}
 }
 
-export const ${cnName} = cn('${name}');
+export const ${cnName} = cn('${name}')
 `
     )
 };
@@ -172,15 +172,15 @@ const createBlockOrElemTsx = (name, blockName = name) => {
     const cnName = `cn${jsName}`;
 
     return (
-        `import React from 'react';
-import {${cnName}, ${interfaceName}} from "./index";
-import './${name}.${outputStylesExtension}';
+        `import React from 'react'
+import { ${cnName}, ${interfaceName} } from "./index"
+import './${name}.${outputStylesExtension}'
 
-const ${jsName}: React.FC<${interfaceName}> = ({className, children}) => (
+const ${jsName}: React.FC<${interfaceName}> = ({children, className}) => (
   <div className={${cnName}({}, [className])}>{children}</div>
-);
+)
 
-export default ${jsName};`)
+export default ${jsName}`)
 };
 
 const createBlock = (blockName, blockDir) => {
